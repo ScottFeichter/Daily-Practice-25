@@ -1,0 +1,106 @@
+
+
+##### GENERAL ALIASES
+
+alias c="clear"
+
+
+##### GIT SETUP ALIASES
+
+alias giadc="git init; git add .; git commit -m \"initial (msg via sh alias)\""
+
+alias gitadc="git init; touch README.md; git add .; git commit -m \"initial (msg via sh alias)\""
+
+alias ghrc="gh repo create"
+
+alias grao="git remote add origin https//github.com/ScottFeichter/"
+
+
+##### GIT TRACK ALIASES
+
+alias gadc="git add .; git commit -m \"misc (msg via sh alias)\""
+
+alias gadcp="git add .; git commit -m \"misc (msg via sh alias)\"; git push"
+
+alias gaac="git add -A; git commit -m \"misc (msg via sh alias)\""
+
+alias gaacp="git add -A; git commit -m \"misc (msg via sh alias)\"; git push"
+
+
+##### SEQUELIZE ALIASES
+
+alias ndsdma="npx dotenv sequelize-cli db:migrate"
+
+alias ndsdmau="npx dotenv sequelize-cli db:migrate:undo:all"
+
+alias ndsdsa="npx dotenv sequelize-cli db:seed:all"
+
+alias ndsdsau="npx dotenv sequelize-cli db:seed:undo:all"
+
+##### NPM ALIASES
+
+alias nrb="npm run build"
+
+alias nrd="npm run dev"
+
+alias ns="npm start"
+
+
+
+#!/bin/zsh
+
+# To make a text file executable cd to the directory then run
+
+# chmod +x myscript.zsh
+
+# To run it ./myscript.zsh argument1 argument2 etc...
+
+
+
+# Make this a function 
+
+
+
+aaTiged(name, operation) {
+   
+if (operation = "npx") {
+
+PROMPT FOR FULL NPX 
+
+npx tiged https://github.com/appacademy/aa08-fetch#full-time aa08-fetch
+
+} else if (operation = "mkdir") {
+
+mkdir <name>
+
+} else (return);
+
+
+
+PROMPT FOR RENAME?
+
+mv aa06-breadth-first-search scott-feichter-aa06-breadth-first-search
+
+cd aa08-async-await-temp
+git init
+git add .
+git commit -m "initial commit"
+npm install
+
+cat > .gitignore (press enter?)
+/node_modules (press enter?)
+(ctrl d?)
+
+git add .
+git commit -m "npm install .gitignore /node_modules"
+
+gh repo create scott-feichter-aa06-breadth-first-search --public
+
+git remote add origin https://github.com/ScottFeichter/scott-feichter-aa06-breadth-first-search
+git branch -M main
+git push -u origin main
+code .
+clear
+
+return;
+
