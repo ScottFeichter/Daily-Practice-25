@@ -12,7 +12,9 @@ public class ZeroThreeProblem {
 
     public static void main (String[] args) {
 
+        System.out.println(46);
         System.out.println(isEven(46));
+        System.out.println(93);
         System.out.println(isEven(93));
     }
 
