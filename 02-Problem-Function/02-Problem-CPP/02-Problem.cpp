@@ -1,3 +1,7 @@
+// TO COMPILE: clang++ file.cpp -o file
+// TO RUN: ./file
+
+
 #include <iostream>
 
 using namespace std;
