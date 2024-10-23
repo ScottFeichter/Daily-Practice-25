@@ -2,4 +2,15 @@
 // print examples with the result for both outcomes to the log
 
 
+func isEven(num: Int) -> Bool {
+    if (num % 2 == 0) {
+        return true;
+    }
 
+    return false;
+}
+
+print(46);
+print(isEven(num: 46));
+print(93);
+print(isEven(num: 93));
