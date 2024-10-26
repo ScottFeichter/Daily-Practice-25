@@ -9,6 +9,7 @@
 
 problem_number=$1
 problem_description=$2
+problem_prompt=$3
 
 folder_name="$problem_number-Problem-$problem_description"
 
@@ -25,23 +26,38 @@ java_prob_num_name="$nums[$first_num]$nums[$second_num]Problem$problem_descripti
 mkdir $folder_name
 cd $folder_name
 
+txt="$problem_number-Problem-$problem_description.txt"
+touch $txt
+echo $problem_prompt>>$txt
+
 
 zsh="$problem_number-Problem-$problem_description.zsh"
 touch $zsh
+echo "# $problem_prompt">>$zsh
 
 js="$problem_number-Problem-$problem_description.js"
 touch $js
+echo "// $problem_prompt">>$js
 
 py="${problem_number}_Problem_$problem_description.py"
 touch $py
+echo "# $problem_prompt">>$py
 
 swift="$problem_number-Problem-$problem_description.swift"
 touch $swift
+echo "// $problem_prompt">>$swift
+
+
+
 
 ts="$problem_number-Problem-$problem_description-TS"
 mkdir $ts
 cd $ts
-touch "$problem_number-Problem-$problem_description.ts"
+
+tsfile="$problem_number-Problem-$problem_description.ts"
+touch $tsfile
+
+echo "// $problem_prompt">>$tsfile
 cd ..
 
 
@@ -49,20 +65,30 @@ cd ..
 cpp="$problem_number-Problem-$problem_description-CPP"
 mkdir $cpp
 cd $cpp
-touch "$problem_number-Problem-$problem_description.cpp"
+
+cppfile="$problem_number-Problem-$problem_description.cpp"
+touch $cppfile
+
+echo "// $problem_prompt">>$cppfile
 cd ..
+
 
 
 java="${problem_number}_Problem_${problem_description}_JAVA"
 mkdir $java
 cd $java
-touch "$java_prob_num_name.java"
+
+javafile="$java_prob_num_name.java"
+touch $javafile
+
+echo "// $problem_prompt">>$javafile
 cd ..
+
 
 
 r="${problem_num_name}_rust"
 cargo new $r
-
+echo "// $problem_prompt">>$r/src/main.rs
 
 
 gaacp
