@@ -1,5 +1,5 @@
 [package]
-name = "zero_five_problem_immutable_rust"
+name = "zero_four_problem_loop_rust"
 version = "0.1.0"
 edition = "2021"
 
