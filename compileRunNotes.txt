@@ -1,0 +1,36 @@
+C++
+
+// TO COMPILE: clang++ file.cpp -o file
+// TO RUN: ./file
+
+JAVA
+
+// BUILD: javac file.java
+// RUN: java file
+
+RUST
+
+// NEW: cargo new filename
+// BUILD: cargo build
+// BUILD AND RUN: cargo run
+
+TS
+
+// TRANSPILE: tsc file.py
+
+JS
+
+// RUN: node file.js
+
+PY
+
+// RUN: python file.py
+
+SWIFT
+
+// RUN: swift file.swift
+
+SHELL
+
+// PERMISSIONS: chmod +x file.zsh
+// RUN: ./myscript.zsh argument1 argument2 etc...
