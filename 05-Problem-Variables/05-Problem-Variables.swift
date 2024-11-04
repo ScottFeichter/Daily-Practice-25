@@ -5,6 +5,6 @@ let immutable = 6;
 
 print("mutable: \(mutable) immutable: \(immutable)");
 
-var+=immutable;
+mutable += immutable;
 
 print("mutable: \(mutable) immutable: \(immutable)");
