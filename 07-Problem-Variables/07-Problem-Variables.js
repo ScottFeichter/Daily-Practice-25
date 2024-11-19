@@ -1,10 +1,10 @@
-// Create a mutable variable and an immutable variable and print each in one log.  Add the immutable variable to the mutable variable. Again print both in a new log.
+// Create a myMutable variable and an myImmutable variable and print each in one log.  Add the myImmutable variable to the myMutable variable. Again print both in a new log.
 
-let mutable = 10;
-const immutable = 19;
+let myMutable = 10;
+const myImmutable = 19;
 
-console.log(`mutable: ${mutable} immutable: ${immutable}`);
+console.log(`myMutable: ${myMutable} myImmutable: ${myImmutable}`);
 
-mutable += immutable;
+myMutable += myImmutable;
 
-console.log(`mutable: ${mutable} immutable: ${immutable}`);
+console.log(`myMutable: ${myMutable} myImmutable: ${myImmutable}`);
