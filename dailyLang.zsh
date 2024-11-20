@@ -13,7 +13,9 @@ problem_prompt=$3
 
 folder_name="$problem_number-Problem-$problem_description"
 
-
+echo $folder_name>>allProblems.txt
+echo $problem_prompt>>allProblems.txt
+echo " ">>allProblems.txt
 
 nums=(Zero One Two Three Four Five Six Seven Eight Nine)
 
