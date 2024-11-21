@@ -1,7 +1,1 @@
-
-08-Problem-Function
-create a function that takes two numbers input and outputs their product
- 
-09-Problem-Function-Multiply-Immut-Mut
 create a mutable variable and an immutable variable. create a function multiply that returns the product of 2 arguments. print the values of the variables and print their product using the multiply function.
- 

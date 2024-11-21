@@ -1,0 +1,6 @@
+[package]
+name = "zero_nine_problem_function-multiply-immut-mut_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
