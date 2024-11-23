@@ -5,3 +5,6 @@ create a function that takes two numbers input and outputs their product
 09-Problem-Function-Multiply-Immut-Mut
 create a mutable variable and an immutable variable. create a function multiply that returns the product of 2 arguments. print the values of the variables and print their product using the multiply function.
  
+10-Problem-Function-Multiply-Mut-Loop-Increment-If-Even
+Create a mutable and an immutable. Create a function that will increment the mutable in the amount of the immutable  using a loop if the mutable is even. If the immutable is odd return the mutable
+ 

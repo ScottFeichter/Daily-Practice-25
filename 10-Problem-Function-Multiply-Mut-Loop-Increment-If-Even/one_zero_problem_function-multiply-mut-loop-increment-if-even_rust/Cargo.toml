@@ -1,0 +1,6 @@
+[package]
+name = "one_zero_problem_function-multiply-mut-loop-increment-if-even_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
