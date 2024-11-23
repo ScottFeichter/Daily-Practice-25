@@ -6,11 +6,11 @@ fn main() {
 
     let mut mutable = 5u8;
     let immutable = 6u8;
-    println!("mutable: {mutable} immutable {immutable}");
+    println!("mutable: {mutable} immutable: {immutable}");
 
     mutable += immutable;
 
-    println!("mutable: {mutable} immutable {immutable}");
+    println!("mutable: {mutable} immutable: {immutable}");
 
 
 
