@@ -12,12 +12,13 @@ func isEven(num: Int) -> Bool{
 
 func evenIncrement(num1: Int, num2: Int) -> Int {
     if (isEven(num: num1)) {
-        let count: Int = num2;
+        var count: Int = num2;
+        var res: Int = num1;
         while count > 0 {
-            num1 += 1;
-            num2 -= 1;
+            res += 1;
+            count -= 1;
         }
-        return num1;
+        return res;
     }
     return num1;
 }
