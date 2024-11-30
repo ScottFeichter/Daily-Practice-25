@@ -1,0 +1,6 @@
+[package]
+name = "one_one_problem_nicksstuff_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
