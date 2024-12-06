@@ -91,6 +91,7 @@ cd ..
 r="${problem_num_name}_rust"
 cargo new $r
 echo "// $problem_prompt">>$r/src/main.rs
+sed -n '4,8p' $r/src/main.rs
 
 
 gaacp
