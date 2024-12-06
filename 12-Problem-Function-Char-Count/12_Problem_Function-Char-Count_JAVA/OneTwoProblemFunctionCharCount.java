@@ -1,7 +1,7 @@
 // Create an int mut variable identified as count and set it to 0. Create a bool mut var id moreThanTen set to false. Create an int func num arg that loops to count chars in a string called length. Create 3 str immut vars. Pass them through to count length and pass the result to moreThanTen. Print the result for each str immut.
 
 
-// having a pass by reference problem!!!!
+// having a pass by reference problem!!!! may need to side quest...
 
 public class OneTwoProblemFunctionCharCount {
 

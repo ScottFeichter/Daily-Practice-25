@@ -1,6 +1,6 @@
 # Create an int mut variable identified as count and set it to 0. Create a bool mut var id moreThanTen set to false. Create an int func num arg that loops to count chars in a string called length. Create 3 str immut vars. Pass them through to count length and pass the result to moreThanTen. Print the result for each str immut.
 
-# there is a problem here with line 14 chatgpt is not helping :()
+# there is a problem here with line 14 chatgpt is not helping :()...may need to side quest...
 
 moreThanTen=false
 
