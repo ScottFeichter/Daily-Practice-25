@@ -14,3 +14,6 @@ Nick makes variables in many languages
 12-Problem-Function-Char-Count
 Create an int mut variable identified as count and set it to 0. Create a bool mut var id moreThanTen set to false. Create an int func num arg that loops to count chars in a string called length. Create 3 str immut vars. Pass them through to count length and pass the result to moreThanTen. Print the result for each str immut.
  
+13-Problem-Function-Multiply-Mut-Loop-Immut
+Create a mutable variable identified as num1 and an immutable variable as num2. Create a function to check if num1 is even - if yes increment num1 by the amount of num2. If no then return num1.
+ 
