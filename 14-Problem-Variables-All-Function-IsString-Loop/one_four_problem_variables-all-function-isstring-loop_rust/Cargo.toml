@@ -1,0 +1,6 @@
+[package]
+name = "one_four_problem_variables-all-function-isstring-loop_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]

@@ -17,3 +17,6 @@ Create an int mut variable identified as count and set it to 0. Create a bool mu
 13-Problem-Function-Multiply-Mut-Loop-Immut
 Create a mutable variable identified as num1 and an immutable variable as num2. Create a function to check if num1 is even - if yes increment num1 by the amount of num2. If no then return num1.
  
+14-Problem-Variables-All-Function-IsString-Loop
+Create an immut var id num, immut var id str1, str2, str3, immut var id bools, immut var id char, immut var floats. Create an mut var id count. Create a fn id isString to return true false if arg is a string. Create a fn with no return that increments count if the arg is a string. Print all the vars and print count before and after checking all the vars.
+ 
