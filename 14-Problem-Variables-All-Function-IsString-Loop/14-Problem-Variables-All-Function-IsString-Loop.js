@@ -19,7 +19,21 @@ const incrementCount = (variable) => {
   if (isString(variable)) count++;
 }
 
+const printType = (primitive) => {
+  console.log(typeof primitive);
+}
+
+
 console.log(num, str1, str2, str3, bools, char, floats, count);
+
+printType(num);
+printType(str1);
+printType(str2);
+printType(str3);
+printType(bools);
+printType(char);
+printType(floats);
+
 
 incrementCount(num);
 incrementCount(str1);
