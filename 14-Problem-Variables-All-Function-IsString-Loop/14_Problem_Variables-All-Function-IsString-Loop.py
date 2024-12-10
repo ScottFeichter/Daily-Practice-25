@@ -11,3 +11,35 @@ floats = 32.32
 count = 0
 
 
+def isString(primitive):
+    return (type(primitive))
+
+def printType(primitive):
+    print(f"{primitive}")
+
+def incrementCount(variable):
+    if type(variable) == str:
+        global count
+        count+=1
+
+
+print(num, str1, str2, str3, bools, char, floats, count)
+
+printType(num)
+printType(str1)
+printType(str2)
+printType(str3)
+printType(bools)
+printType(char)
+printType(floats)
+
+
+incrementCount(num)
+incrementCount(str1)
+incrementCount(str2)
+incrementCount(str3)
+incrementCount(bools)
+incrementCount(char)
+incrementCount(floats)
+
+print(f'final count: {count}')
