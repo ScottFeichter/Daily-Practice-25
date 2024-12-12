@@ -20,3 +20,6 @@ Create a mutable variable identified as num1 and an immutable variable as num2. 
 14-Problem-Variables-All-Function-IsString-Loop
 Create an immut var id num, immut var id str1, str2, str3, immut var id bools, immut var id char, immut var floats. Create an mut var id count. Create a fn id isString to return true false if arg is a string. Create a fn with no return that increments count if the arg is a string. Print all the vars and print count before and after checking all the vars.
  
+15-Problem-Primitives-Loop-Conditional-Function
+Initiate a variable for every primitive. Initiate an int id count set to 0. Declare fn incrementCount that takes an int and if int gt 5 will loop the amount of int adding local adder + 1 each loop. Print all variables and run the int variable through incrementCount and print the return.
+ 
