@@ -7,7 +7,7 @@ const chr = 'c';
 const str = 'string';
 const boo = false;
 
-let count = 0;
+
 
 const incrementCount = (num) => {
   if (num > 5) {
@@ -25,4 +25,4 @@ const incrementCount = (num) => {
 
 console.log(`nint: ${nint} flote: ${flote} chr: ${chr} str: ${str} boo: ${boo}`);
 console.log(`incrementCount(nint): ${incrementCount(nint)}`);
-console.log(`incrementCount(flote): ${incrementCount(flote)}`);
+
