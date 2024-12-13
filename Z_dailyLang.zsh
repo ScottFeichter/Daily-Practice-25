@@ -91,6 +91,8 @@ cd ..
 r="${problem_num_name}_rust"
 cargo new $r
 echo "// $problem_prompt">>$r/src/main.rs
+
+## working on capturing the lines and moving them to the top:
 sed -n '4,8p' $r/src/main.rs
 
 

@@ -16,7 +16,8 @@ RUST
 
 TS
 
-// TRANSPILE: tsc file.py
+// TRANSPILE: tsc file.ts
+// GENERATE tsconfig.json: tsc --init
 
 JS
 
