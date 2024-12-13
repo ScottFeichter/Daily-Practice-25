@@ -60,6 +60,8 @@ tsfile="$problem_number-Problem-$problem_description.ts"
 touch $tsfile
 
 echo "// $problem_prompt">>$tsfile
+
+tsc --init
 cd ..
 
 
