@@ -1,0 +1,26 @@
+// Modifers:
+//  I. Access Modifiers - controls the access level
+        // - classes:
+                // public - any class can access it
+                // none (default) - only classes in same package can access
+
+        // - attributes, methods, constructors:
+                // public - any class can access it
+                // private - only accessible within the declared class
+                // none (default) - only accessible within the same package
+                // protected - accessible in the same package and subclasses
+
+//  II. Non Access Modifiers - provide other functionality (aka optional specifiers?)
+        // - classes:
+                // final - cannot be inherited by other classes
+                // abstract - cannot be used to create objects (must be inherited)
+
+        // - attributes, methods:
+                // final - cannot be overridden/modified
+                // abstract - can only be used in the abstract class and only on methods
+                // static - belongs to the class rather than the object
+                // transient - skipped when serializing the object containing them
+                // synchronized - methods can only be accessed by one thread at a time
+                // volatile - value of an attribute is not cached thread-locally, and is always read from the "main memory"
+
+// https://www.w3schools.com/java/java_modifiers.asp
