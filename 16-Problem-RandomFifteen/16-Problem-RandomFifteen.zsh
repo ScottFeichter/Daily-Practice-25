@@ -10,8 +10,8 @@ boo=1;
 function incrementNint() {
     local -i local_nint=$1;
     if (($local_nint > 5)); then
-        local -i adder=nint=$(($(($RANDOM%$((10-1+1))))+X));
-        local -i loops=nint=$(($(($RANDOM%$((10-1+1))))+X));
+        local -i adder$(($(($RANDOM%$((10-1+1))))+X));
+        local -i loops=$(($(($RANDOM%$((10-1+1))))+X));
         echo "adder: " $adder;
         echo "loops: " $loops;
         while (($loops > 0)); do
