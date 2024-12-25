@@ -3,4 +3,6 @@ name = "one_seven_problem_repeatsixteen_rust"
 version = "0.1.0"
 edition = "2021"
 
+
 [dependencies]
+rand = "0.8"
