@@ -29,3 +29,6 @@ Do everything in problem 15 but make the int generated from randome between 1 - 
 17-Problem-RepeatSixteen
 Repeat problem 16 to work in the rote memorization of declaring most types, generating random numbers in a range, declaring a functions, using loops, using conditionals, and printing to console.
  
+18-Problem-RepeatSixteenAgain
+Repeat problem 16 again to work rote memory of basic syntax.
+ 

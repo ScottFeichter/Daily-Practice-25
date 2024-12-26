@@ -1,0 +1,6 @@
+[package]
+name = "one_eight_problem_repeatsixteenagain_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
