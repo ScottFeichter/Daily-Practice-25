@@ -20,3 +20,5 @@ const incrementNint = (num: number) => {
   return num;
 }
 
+console.log(`NINT: ${NINT} FLOTE: ${FLOTE} CHR: ${CHR} STR: ${STR} BOO: ${BOO}`);
+console.log(`incrementNint(NINT): ${incrementNint(NINT)}`);
