@@ -1,0 +1,6 @@
+[package]
+name = "one_nine_problem_repeatsixteenanddefinearray_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
