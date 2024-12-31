@@ -7,6 +7,7 @@ const STR = "String";
 const BOO = false;
 
 let nums = [0, 1, 2, 3];
+let flotes = [11.11, 22.22, 33.33, 44.44];
 let chars = ['a', 'b', 'c', 'd'];
 let stirs = ["Hello", "World", "I", "am", "Scott"];
 let boos = [true, false, false, true];
