@@ -1,5 +1,7 @@
 # Repeat problem Sixten but this time also create an array of nums, an array of chars, an array of strings, and an array of booleans
 
+# printing of the arrays is only doing 0 index
+
 declare -i -r NINT=$(($(($RANDOM%$((10-1+1))))+X));
 declare -i -r NOTFLOTE=32;
 readonly CHR='c';
@@ -27,3 +29,9 @@ function incrementNint() {
     fi
     echo $local_num;
 }
+
+echo "NINT: " $NINT " NOTFLOTE: " $NOTFLOTE " CHR: " $CHR " STR: " $STR " BOO: " $BOO
+
+echo "nums: " $nums " notflotes: " $notflotes " chars: " $chars " stirs: " $stirs " boos: " $boos
+
+incrementNint $NINT
