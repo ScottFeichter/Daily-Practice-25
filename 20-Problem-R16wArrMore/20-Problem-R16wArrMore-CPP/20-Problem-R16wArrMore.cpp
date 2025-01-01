@@ -1,0 +1,1 @@
+// Repeat problem 19 but include an array of mixed type if possible, and an empty array if possible
