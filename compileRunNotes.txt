@@ -14,6 +14,17 @@ RUST
 // BUILD: cargo build
 // BUILD AND RUN: cargo run
 
+GO
+
+// NEW MODULE: go mod init <module name> (the module name is usually the place on the internet where it would be found for example.com/go-demo-1)
+// NEW PACKAGE: inside the module can create a folder name it whatever
+// NEW FILE: inside the package (folder) create a something.go file
+// TO RUN: go run <filename>.go
+
+// VARIABLES: var & const can be used anywhere | := can only be used inside functions
+// VARIABLE DEFAULT VALUES: if you declare a variable but do not assign it it will have a default value depending on the type ie 0 is default for int
+// VARIABLE TYPE INFERENCE: it will try to infer the type if you do not specify
+
 TS
 
 // TRANSPILE: tsc file.ts
