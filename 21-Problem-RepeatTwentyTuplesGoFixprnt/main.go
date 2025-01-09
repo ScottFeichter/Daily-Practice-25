@@ -3,15 +3,13 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"time"
+
 )
 
 func incrementNint(num int) int {
 	var local_num int = num;
 	if(num > 5){
 
-	  // Seed the random number generator
-	  rand.Seed(time.Now().UnixNano())
 
 	  var adder int = rand.Intn(10) + 1;
 	  var loops int = rand.Intn(10) + 1;
@@ -28,9 +26,16 @@ func incrementNint(num int) int {
 func main() {
 
 	// Seed the random number generator
-	rand.Seed(time.Now().UnixNano())
+	// This ensures different random numbers each time the program runs
+	// rand.Seed(time.Now().UnixNano())
+	// rand.Seed is deprecated: As of Go 1.20 there is no reason to call Seed with a random value. Programs that call Seed with a known value to get a specific sequence of results should use New(NewSource(seed)) to obtain a local random generator.
 
-	const NINT int = rand.Intn(10) + 1;
+
+
+	// generate a random integer between 1 and 10 in golang
+
+
+	var NINT int = rand.Intn(10) + 1; // this can't be a constant(?)
 	const FLOTE float32 = 32.32;
 	const CHR string = "c";
 	const STR string = "String";
@@ -49,7 +54,7 @@ func main() {
 
 	var mixtinterface = []interface{}{0, "b", "three", false}; // this is an interface as Go does not have mixed type arrays or tuples
 
-	fmt.Printf("NINT: %d FLOTE: %.2f CHR: %c STR: %s BOO: %t undv: %v\n", NINT, FLOTE, CHR, STR, BOO, undv)
+	fmt.Printf("NINT: %d FLOTE: %.2f CHR: %s STR: %s BOO: %t undv: %v\n", NINT, FLOTE, CHR, STR, BOO, undv)
 	fmt.Printf("nums: %v flotes: %v chars: %s stirs: %v boos: %v mixta: %v unda: %v\n",
 		nums,
 		flotes,
