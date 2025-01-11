@@ -1,0 +1,6 @@
+[package]
+name = "two_three_problem_b75-is-anagram_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
