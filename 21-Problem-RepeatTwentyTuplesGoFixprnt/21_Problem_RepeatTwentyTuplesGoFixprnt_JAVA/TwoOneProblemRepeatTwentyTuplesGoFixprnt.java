@@ -5,7 +5,7 @@
 import java.io.*;
 import java.util.*;
 import java.util.ArrayList;
-import org.javatuples.Quartet; // this requires a download of the javatuples jar file via maven...don't feel like digging in to this
+import org.javatuples.Quartet; // this requires a download of the javatuples jar file via maven...don't feel like digging in to this https://mvnrepository.com/artifact/org.javatuples/javatuples/1.2
 
 public class TwoOneProblemRepeatTwentyTuplesGoFixprnt{
 
