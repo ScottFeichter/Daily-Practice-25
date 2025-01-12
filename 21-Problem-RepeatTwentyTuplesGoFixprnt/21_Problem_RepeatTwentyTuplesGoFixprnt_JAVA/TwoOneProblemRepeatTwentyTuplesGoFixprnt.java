@@ -5,6 +5,7 @@
 import java.io.*;
 import java.util.*;
 import java.util.ArrayList;
+import org.javatuples.Quartet; // this requires a download of the javatuples jar file via maven...don't feel like digging in to this
 
 public class TwoOneProblemRepeatTwentyTuplesGoFixprnt{
 
@@ -72,12 +73,25 @@ public class TwoOneProblemRepeatTwentyTuplesGoFixprnt{
         // empty array
         int[] unda; // can do this but can't prnt until initialize
 
-        // 
+
+        // Java has a library for tuples that can be used for similar functionality and it looks like this:
+
+        // Create a tuple with 4 elements of different types
+        Quartet<Integer, Character, String, Boolean> mixtuple = Quartet.with(0, 'c', "string", false);
+
+        // To access elements, you can use:
+        Integer first = mixtuple.getValue0();   // gets 0
+        Character second = mixtuple.getValue1(); // gets 'c'
+        String third = mixtuple.getValue2();    // gets "string"
+        Boolean fourth = mixtuple.getValue3();   // gets false
+
+        // To print the tuple
+        System.out.println(mixtuple);  // Will print: [0, c, string, false]
 
 
         System.out.println("NINT: " + NINT + " DOUBLE: " + DBL + " CHR: " + CHR + "STR: " + STR + " BOO: " + BOO);
 
-        System.out.println("nums: " + nums + " dubs: " + dubs + " chars: " + chars + " stirs: " + stirs + " boos: " + boos + " mixta " + mixta);
+        System.out.println("nums: " + nums + " dubs: " + dubs + " chars: " + chars + " stirs: " + stirs + " boos: " + boos + " mixta " + mixta + " mixedArray: " + mixedArray + " mixtuple: ", mixtuple);
 
         System.out.println("incrementNint(NINT): " + incrementNint(NINT));
 
