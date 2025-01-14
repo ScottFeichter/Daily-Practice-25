@@ -43,7 +43,7 @@ console.log(containsDuplicate(nums3)) // true
 console.log(containsDuplicate(nums4)) // true
 console.log(containsDuplicate(nums5)) // false
 console.log(containsDuplicate(nums6)) // false
-console.log(containsDuplicate(nums7)) // false
+console.log(containsDuplicate(nums7)) // true ***
 
 
 console.log(hasDuplicate(nums1)) // false
@@ -52,4 +52,4 @@ console.log(hasDuplicate(nums3)) // true
 console.log(hasDuplicate(nums4)) // true
 console.log(hasDuplicate(nums5)) // false
 console.log(hasDuplicate(nums6)) // false
-console.log(hasDuplicate(nums7)) // false
+console.log(hasDuplicate(nums7)) // true ***
