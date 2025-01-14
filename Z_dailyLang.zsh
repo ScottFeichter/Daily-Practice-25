@@ -25,6 +25,12 @@ problem_num_name="$nums[$first_num]:l_$nums[$second_num]:l_problem_$problem_desc
 
 java_prob_num_name="$nums[$first_num]$nums[$second_num]Problem$problem_description"
 
+go_prob_num_name="$nums[$first_num]$nums[$second_num]Problem$problem_description"
+
+
+#################################################################################################
+
+
 mkdir $folder_name
 cd $folder_name
 
@@ -50,6 +56,10 @@ touch $swift
 echo "// $problem_prompt">>$swift
 
 
+# making a package instead - see below
+# go="$problem_number-Problem-$problem_description.go"
+# touch $go
+# echo "// $problem_prompt">>$go
 
 
 ts="$problem_number-Problem-$problem_description-TS"
@@ -78,6 +88,38 @@ cd ..
 
 
 
+
+go="$problem_number-Problem-$problem_description-GO"
+mkdir $go
+cd $go
+
+go mod init $go
+
+gop="$go-Package"
+mkdir $gop
+cd $gop
+
+gofile="$go_prob_num_name.go"
+touch $gofile
+cat << EOF > $gofile
+// $problem_prompt
+
+package $gofile
+
+import (
+	"fmt"
+	"math/rand"
+)
+
+func main {
+
+
+}
+EOF
+cd ../..
+
+
+
 java="${problem_number}_Problem_${problem_description}_JAVA"
 mkdir $java
 cd $java
@@ -85,17 +127,32 @@ cd $java
 javafile="$java_prob_num_name.java"
 touch $javafile
 
-echo "// $problem_prompt">>$javafile
+cat << EOF > $javafile
+// $problem_prompt
+
+import java.io.*;
+
+public class $java_prob_num_name {
+
+   public static void main(String[] args){
+
+   }
+}
+EOF
 cd ..
 
 
 
 r="${problem_num_name}_rust"
 cargo new $r
-echo "// $problem_prompt">>$r/src/main.rs
+cat << EOF > $r/src/main.rs
+// $problem_prompt
 
-## working on capturing the lines and moving them to the top:
-sed -n '4,8p' $r/src/main.rs
+fn main() {
+    println!("Hello, world!");
+}
+EOF
+
 
 
 gaacp
