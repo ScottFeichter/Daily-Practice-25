@@ -1,78 +1,51 @@
 
 08-Problem-Function
 create a function that takes two numbers input and outputs their product
- 
+
 09-Problem-Function-Multiply-Immut-Mut
 create a mutable variable and an immutable variable. create a function multiply that returns the product of 2 arguments. print the values of the variables and print their product using the multiply function.
- 
+
 10-Problem-Function-Multiply-Mut-Loop-Increment-If-Even
 Create a mutable and an immutable. Create a function that will increment the mutable in the amount of the immutable  using a loop if the mutable is even. If the immutable is odd return the mutable
- 
+
 11-Problem-NicksStuff
 Nick makes variables in many languages
- 
+
 12-Problem-Function-Char-Count
 Create an int mut variable identified as count and set it to 0. Create a bool mut var id moreThanTen set to false. Create an int func num arg that loops to count chars in a string called length. Create 3 str immut vars. Pass them through to count length and pass the result to moreThanTen. Print the result for each str immut.
- 
+
 13-Problem-Function-Multiply-Mut-Loop-Immut
 Create a mutable variable identified as num1 and an immutable variable as num2. Create a function to check if num1 is even - if yes increment num1 by the amount of num2. If no then return num1.
- 
+
 14-Problem-Variables-All-Function-IsString-Loop
 Create an immut var id num, immut var id str1, str2, str3, immut var id bools, immut var id char, immut var floats. Create an mut var id count. Create a fn id isString to return true false if arg is a string. Create a fn with no return that increments count if the arg is a string. Print all the vars and print count before and after checking all the vars.
- 
+
 15-Problem-Primitives-Loop-Conditional-Function
 Initiate a variable for every primitive. Initiate an int id count set to 0. Declare fn incrementCount that takes an int and if int gt 5 will loop the amount of int adding local adder + 1 each loop. Print all variables and run the int variable through incrementCount and print the return.
- 
+
 16-Problem-RandomFifteen
 Do everything in problem 15 but make the int generated from randome between 1 - 10
- 
+
 17-Problem-RepeatSixteen
 Repeat problem 16 to work in the rote memorization of declaring most types, generating random numbers in a range, declaring a functions, using loops, using conditionals, and printing to console.
- 
+
 18-Problem-RepeatSixteenAgain
 Repeat problem 16 again to work rote memory of basic syntax.
- 
+
 19-Problem-RepeatSixteenAndDefineArray
 Repeat problem Sixten but this time also create an array of nums, an array of chars, an array of strings, and an array of booleans
- 
+
 20-Problem-R16wArrMore
 Repeat problem 19 but include an array of mixed type if possible, and an empty array if possible
- 
+
 21-Problem-RepeatTwentyTuplesGoFixprnt
 Repeat problem 20 - make the mixed arrays tuples (they already are), fix the printing by reference, and add the Go language
- 
+
 22-Problem-B75-Duplicate-Integer
 Given an integer array nums, return true if any value appears more than once in the array, otherwise return false
- 
+
 23-Problem-B75-Is-Anagram
 Given two strings s and t, return true if the two strings are anagrams of each other, otherwise return false.
 
 An anagram is a string that contains the exact same characters as another string, but the order of the characters can be different.
- 
-24-Problem-Test
-this is a test
- 
-25-Problem-Test
-this is a test
- 
-26-Problem-Test
-this is a test
- 
-27-Problem-Test
-this is a test
- 
-28-Problem-Test
-this is a test
- 
-29-Problem-Test
-this is a test
- 
-30-Problem-Test
-this is a test
- 
-31-Problem-Test
-this is a test
- 
-32-Problem-Test
-this is a test
- 
+
