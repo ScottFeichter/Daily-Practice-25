@@ -8,6 +8,12 @@ nums5 = [] # edge empty array
 nums6 = [1] # edge single element array
 nums7 = [1, 'a', 3.3, "four!", 1] # not applicable because should be only nums
 
+# use hashmap or set to keep track of seen nums as we iterate through array
+# if we see a num that is already in the hashmap/set, return true
+# if we iterate through entire array and don't see a dup, return false
+
+# both are O(n) time complexity and O(n) space complexity
+
 def containsDuplicate(nums):
     seenNums = {}
     for num in nums:

@@ -12,6 +12,7 @@ const nums7 = [1, 'a', 3.3, "four!", 1] // not applicable because should be only
 // use hashmap or set to keep track of seen nums as we iterate through array
 // if we see a num that is already in the hashmap/set, return true
 // if we iterate through entire array and don't see a dup, return false
+// both are O(n) time complexity and O(n) space complexity
 
 const containsDuplicate = (nums) => {
     // should we be checking for array of mixed type?
@@ -34,8 +35,6 @@ const hasDuplicate = (nums) => {
     }
     return false
 }
-
-// both are O(n) time complexity and O(n) space complexity
 
 console.log(containsDuplicate(nums1)) // false
 console.log(containsDuplicate(nums2)) // true
