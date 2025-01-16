@@ -1,0 +1,6 @@
+[package]
+name = "two_five_problem_b75-product-of-array-except-self_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]

@@ -49,3 +49,16 @@ Given two strings s and t, return true if the two strings are anagrams of each o
 
 An anagram is a string that contains the exact same characters as another string, but the order of the characters can be different.
 
+24-Problem-Top-K-Most-Frequent-Ele
+Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.
+ 
+25-Problem-B75-Product-Of-Array-Except-Self
+Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i].
+
+The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer.
+
+You must write an algorithm that runs in O(n) time and without using the division operation.
+ 
+24-Problem-B75-Top-K-Most-Frequent-Ele
+Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order
+ 
