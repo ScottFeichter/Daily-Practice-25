@@ -203,10 +203,12 @@ using namespace std;
 
 // ============
 
-bool containsDuplicateUsingStruct(int nums[]){
+bool containsDuplicateUsingStruct(vector<int> nums){ // this is passing by value???
   struct {} Counter;
 
-  int length = sizeof(nums) / sizeof(nums[0]);
+//   int length = sizeof(nums) / sizeof(nums[0]); // this is for arrays
+
+  int lenth = nums.size() // this is for vectors
 
   for (int i = 0; i < length; i++) {
 
@@ -221,7 +223,8 @@ bool containsDuplicateUsingStruct(int nums[]){
 
 // ============
 
-bool containsDuplicateUsingSet(const std::vector<int>& nums) {
+bool containsDuplicateUsingSet(const vector<int>& nums) { // this is passing by reference and is preferred because it prevents unnecessary copying and guarantees the vector won't be modified???
+
     std::unordered_set<int> seen;
     for (int num : nums) {
         // If the number is already in the set, we found a duplicate
