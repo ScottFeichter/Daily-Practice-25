@@ -1,5 +1,7 @@
 fn main() {
 
+    // https://doc.rust-lang.org/stable/rust-by-example/hello/print.html
+
     // This is an example of a line comment.
     /* Block Comment */
 
