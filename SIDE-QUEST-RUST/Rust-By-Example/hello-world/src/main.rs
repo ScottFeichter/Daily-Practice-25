@@ -2,6 +2,8 @@ fn main() {
 
     // https://doc.rust-lang.org/stable/rust-by-example/hello/print.html
 
+    // come back later on for more info Hello World -> 1.2 Formatted print
+
     // This is an example of a line comment.
     /* Block Comment */
 
