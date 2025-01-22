@@ -28,7 +28,7 @@ const containsDuplicate = (nums) => {
 
 const hasDuplicate = (nums) => {
   // should we be checking for array of mixed type?
-    const seenNums = {}
+    const seenNums = [];
     for (let num of nums) {
         if (seenNums[num]) return true
         seenNums[num] = true
