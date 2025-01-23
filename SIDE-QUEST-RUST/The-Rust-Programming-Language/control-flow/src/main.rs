@@ -78,12 +78,77 @@ fn main() {
     }
 
 
+    fn while_loopy() -> bool {
+
+            let mut number = 3;
+
+            while number != 0 {
+                println!("{number}!");
+
+                number -= 1;
+            }
+
+            println!("LIFTOFF!!!");
+            return true;
+
+    }
+
+    fn while_collection() -> bool {
+
+        let arr: [i32; 5]  = [10, 20, 30, 40, 50];
+        let mut index = 0;
+
+        while index < 5 {
+            println!("the value is: {}", arr[index]);
+
+            index += 1;
+        }
+
+
+        return true;
+    }
+
+
+
+    fn for_in_loop() -> bool {
+        let arr: [i32; 5] = [10, 20, 30, 40, 50];
+
+        for element in arr {
+            println!("the value is: {element}");
+        }
+
+
+        return true;
+    }
+
+
+
+    fn for_in_loop_range_rev() -> bool {
+
+        let arr: [i32; 5] = [10, 20, 30, 40, 50];
+
+        for number in (1..arr.len()).rev() {
+            println!("{number}!");
+        }
+        println!("LIFTOFF!!!");
+
+
+        return true;
+    }
+
+
+
 
     println!("The value of number is: {number}");
     println!("7 is greater than 5: {}", greater_than_five(7));
     println!("6 is divisible by 4, 3, or 2: {}", divisible_four_three_or_two(6));
     println!("{}", loops_return_value());
     println!("{}", loop_labels());
+    println!("{}", while_loopy());
+    println!("{}", while_loopy());
+    println!("{}", while_collection());
+    println!("{}", for_in_loop());
+    println!("{}", for_in_loop_range_rev());
 
 
 
