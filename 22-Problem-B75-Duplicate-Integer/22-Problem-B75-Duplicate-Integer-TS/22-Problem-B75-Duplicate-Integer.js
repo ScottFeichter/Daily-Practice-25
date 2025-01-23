@@ -40,6 +40,7 @@ console.log(containsDuplicate(nums4)); // true
 console.log(containsDuplicate(nums5)); // false
 console.log(containsDuplicate(nums6)); // false
 console.log(containsDuplicate(nums7)); // true ***
+
 console.log(hasDuplicate(nums1)); // false
 console.log(hasDuplicate(nums2)); // true
 console.log(hasDuplicate(nums3)); // true
