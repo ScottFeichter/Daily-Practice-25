@@ -1,0 +1,56 @@
+NOTES
+
+Ownership is about memory management and who is respoinsible for it and what the rules are.
+
+Approaches
+- garbage collector
+- explicitly by programmer
+- ownership with set of rules that compiler checks
+
+Stack and Heap
+- Most lang don't require you to think about stack and heap
+- https://www.linkedin.com/pulse/understanding-stack-heap-computer-memory-rahul-dhiman-gb7wc
+- https://www.geeksforgeeks.org/stack-vs-heap-data-structure/
+- both are parts of memory available to your code to use at runtime but they are structured different
+
+Stack
+- Direct access
+- does not use pointer to get x
+- LIFO
+- physically closer to the processing that the heap
+fn main() {
+    let x = 42; // Stored directly on the stack (fixed size, known at compile time)
+    let y = [1, 2, 3]; // Array of fixed size is also stored on the stack
+    println!("{}, {:?}", x, y);
+}
+
+Heap
+- Indirect access
+- s uses a pointer from stack to heap
+- TREEISH
+- physically further away than the stack to the processing
+fn main() {
+    let s = String::from("Hello, Heap!"); // String's contents are stored on the heap
+    println!("{}", s);
+}
+
+Allocating On The Heap
+- often just referred to as allocating
+- allocator finds empty spot on heap that is big enough
+- marks it as being in use and returns a pointer (the address of that location)
+
+Pushing To The Stack
+- faster than allocating because the allocator doesn't have to search for a place to store it
+
+
+Keeping track of what parts of code are using what data on the heap, minimizing the amount of duplicate data on the heap, and cleaning up unused data on the heap so you don’t run out of space are all problems that ownership addresses.
+
+Once you understand ownership, you won’t need to think about the stack and the heap very often, but knowing that the main purpose of ownership is to manage heap data can help explain why it works the way it does.
+
+
+OWNERSHIP RULES
+- Each value in Rust has an ownership
+- There can only be one owner at a time
+- When the owner goes out of scope, the value will be dropped
+
+
