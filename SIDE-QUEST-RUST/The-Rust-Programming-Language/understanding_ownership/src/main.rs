@@ -1,11 +1,11 @@
 fn main() {
 // ####################################
-    // VRIABLE SCOPE
+    // VARIABLE SCOPE
 
     // STRING LITERAL
     // - primitive and immutable and known at compile time and only on stack
 
-    // s is not valid here, it's not yet declared
+    // sl is not valid here, it's not yet declared
     let sl = "hello"; // sl is valid from this point forward, it comes in to scope
     // scope is from point of declaration until end of current scope
 
@@ -56,6 +56,91 @@ fn main() {
 
 
 
+
+
+
+
+    // REFERENCES AND BORROWING
+
+    // & is the reference operator
+    // * is the dereference operator
+
+
+    // A reference is like a pointer in that it’s an address we can follow to access the data stored at that address; that data is owned by some other variable.
+    // Unlike a pointer, a reference is guaranteed to point to a valid value of a particular type for the life of that reference.
+
+    // Since it does not own the value will not be dropped when the reference stops being used
+
+    // The action of creating a reference is called borrowing
+
+    // A mutable reference to a value can have no other references to that value even other immutables
+    // This helps prevent data races at compile time
+
+    // data races:
+    // - two or more pointers access the same data at the same time
+    // - at least one of the pointers is being used to write the data
+    // - there is no mechanism being used to synchronize access to the data
+
+    // multiple immutable references are allowed but if an immutable reference exists there will not be a mutable reference until the scope of the immutables ends
+
+    // mutable reference scope:
+    //
+
+
+    // DANGLING REFERENCES
+    // a pointer that references a location in memory that may have been given to someone else—by freeing some memory while preserving a pointer to that memory
+
+    // In Rust the compiler guarantees that references will never be dangling references:
+    // if you have a reference to some data, the compiler will ensure that the data will not go out of scope before the reference to the data does.
+
+
+
+    // THE RULES OF REFERENCES
+
+    // - At any given time, you can have either one mutable reference or any number of immutable references.
+    // - References must always be valid.
+
+
+
+
+
+
+    // THE SLICE
+
+    // Slices let you reference a contiguous sequence of elements in a collection rather than the whole collection.
+    // A slice is a kind of reference, so it does not have ownership.
+
+
+    // String Slices
+    // starting index...ending index (use + 1 of the actual end)
+    // this going to track the starting index and the length of the slice
+    // the string slice prevents a silent failure of a borrowed mutable reference existing at the same time as an immutable reference???
+    // the type for a string slice is:  &str
+
+    // Syntatic Sugar on the range syntax
+    // [..2] === [0..2]
+    // [3..len] === [3..]
+    // [..] === [0..len]
+
+
+    // STRING LITERALS AS SLICES
+
+    // the variable of a string literal IS a string slice because they are both an immutable reference to something (on the stack???)...
+
+
+    // STRING SLICES AS PARAMETERS
+    // they will work on slices and types...
+
+
+    // OTHER SLICES
+    // you can have a slice of any (same type collection???)  and it's going represent the same thing which is the start and the length primitive types...
+
+
+    // SUMMARY
+
+    // The concepts of ownership, borrowing, and slices ensure memory safety in Rust programs at compile time.
+    // The Rust language gives you control over your memory usage in the same way as other systems programming languages,
+    // but having the owner of data automatically clean up that data when the owner goes out of scope means you don’t have to write and debug extra code to get this control.
 
 
 
