@@ -1,0 +1,6 @@
+[package]
+name = "using-tuple-structs-without-named-fields-to-create-different-types"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]

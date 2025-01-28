@@ -14,6 +14,11 @@ RUST
 // BUILD: cargo build
 // BUILD AND RUN: cargo run
 
+// or to just use a file
+
+// rustc $file-name
+// ./$binary-name
+
 GO
 
 // NEW MODULE: go mod init <module name> (the module name is usually the place on the internet where it would be found for example.com/go-demo-1)
