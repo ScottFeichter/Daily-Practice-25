@@ -1,0 +1,8 @@
+[package]
+name = "scottfeichter"
+version = "0.1.0"
+edition = "2021"
+description = "My first crate"
+licesnse = "MIT OR Apache-2.0"
+
+[dependencies]
