@@ -6,13 +6,16 @@ shifted num characters in the alphabet.
 Feel free to use this variable: let alphabet = "abcdefghijklmnopqrstuvwxyz";
 */
 
-function caesarCipher(string, num) {
-    // Your code here 
+const alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+function caesarCipher(str: string, num: number): string {
+
+    let nuStr: string = "";
 }
 
-// console.log(caesarCipher("apple", 1)); // "bqqmf"
-// console.log(caesarCipher("bootcamp", 2)); // "dqqvecor"
-// console.log(caesarCipher("zebra", 4)); // "difve"
+console.log(caesarCipher("apple", 1)); // "bqqmf"
+console.log(caesarCipher("bootcamp", 2)); // "dqqvecor"
+console.log(caesarCipher("zebra", 4)); // "difve"
 
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
 module.exports = caesarCipher;
