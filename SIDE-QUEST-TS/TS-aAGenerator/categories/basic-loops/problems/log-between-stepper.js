@@ -8,14 +8,13 @@ should represent the interval.
 HINT: This function only needs to print using console.log it does not need to
 return anything.
 */
-
-const logBetweenStepper = (num1: number, num2: number, num3: number): void => {
-  if(num1 === num2) console.log("min and max are the same");
-  for(let i = num1; i <= num2; i+=num3){
-    console.log(i);
-  }
-}
-
+var logBetweenStepper = function (num1, num2, num3) {
+    if (num1 === num2)
+        console.log("min and max are the same");
+    for (var i = num1; i <= num2; i += num3) {
+        console.log(i);
+    }
+};
 logBetweenStepper(5, 9, 1);
 /* prints out:
 5
@@ -24,6 +23,5 @@ logBetweenStepper(5, 9, 1);
 8
 9
 */
-
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
 module.exports = logBetweenStepper;

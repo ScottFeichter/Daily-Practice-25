@@ -5,18 +5,17 @@ otherwise.
 
 Vowels are the letters "a", "e", "i", "o", "u".
 */
-
-const hasVowel = (str: string): boolean => {
-  const vowels: string = "aeiouAEIOU";
-  for(let char of str) {
-    if(vowels.includes(char)) return true;
-  }
-  return false;
-}
-
-console.log(hasVowel('dog'));          // => true
+var hasVowel = function (str) {
+    var vowels = "aeiouAEIOU";
+    for (var _i = 0, str_1 = str; _i < str_1.length; _i++) {
+        var char = str_1[_i];
+        if (vowels.includes(char))
+            return true;
+    }
+    return false;
+};
+console.log(hasVowel('dog')); // => true
 console.log(hasVowel('conventional')); // => true
-console.log(hasVowel('rhythm'));       // => false
-
+console.log(hasVowel('rhythm')); // => false
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
 module.exports = hasVowel;
