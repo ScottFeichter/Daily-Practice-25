@@ -5,15 +5,24 @@ contain a vowel, return null.
 
 Vowels are the letters "a", "e", "i", "o", "u".
 */
+fn main() {
 
-// Your code here 
 
-// console.log(getLastVowel('battery'));      // 'e'
-// console.log(getLastVowel('tunnel'));       // 'e'
-// console.log(getLastVowel('dog'));          // 'o'
-// console.log(getLastVowel('conventional')); // 'a'
-// console.log(getLastVowel('rhythm'));       // null
-// console.log(getLastVowel('try'));          // null
+    fn get_last_vowel(str: &str) -> Option<char> {
+        let vowels = vec!['a', 'e', 'i', 'o', 'u'];
+
+        str.chars().rfind(|&c| vowels.contains(&c))
+    }
+
+
+    println!("{:?}", get_last_vowel("battery"));      // "e"
+    println!("{:?}", get_last_vowel("tunnel"));       // "e"
+    println!("{:?}", get_last_vowel("dog"));          // "o"
+    println!("{:?}", get_last_vowel("conventional")); // "a"
+    println!("{:?}", get_last_vowel("rhythm"));       // null
+    println!("{:?}", get_last_vowel("try"));          // null
+
+}
 
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
-module.exports = getLastVowel;
+// module.exports = getLastVowel;

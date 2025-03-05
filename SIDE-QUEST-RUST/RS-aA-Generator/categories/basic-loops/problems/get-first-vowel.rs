@@ -6,14 +6,23 @@ contain a vowel, return null.
 Vowels are the letters "a", "e", "i", "o", "u".
 */
 
-// Your code here 
+fn main() {
 
-// console.log(getFirstVowel('battery'));      // 'a'
-// console.log(getFirstVowel('tunnel'));       // 'u'
-// console.log(getFirstVowel('dog'));          // 'o'
-// console.log(getFirstVowel('conventional')); // 'o'
-// console.log(getFirstVowel('rhythm'));       // null
-// console.log(getFirstVowel('try'));          // null
+fn get_first_vowel(str: &str) -> Option<char> {
+    let vowels = vec!['a', 'e', 'i', 'o', 'u'];
+
+    str.chars().find(|&c| vowels.contains(&c))
+
+}
+
+println!("{:?}", get_first_vowel("battery"));      // "a"
+println!("{:?}", get_first_vowel("tunnel"));       // "u"
+println!("{:?}", get_first_vowel("dog"));          // "o"
+println!("{:?}", get_first_vowel("conventional")); // "o"
+println!("{:?}", get_first_vowel("rhythm"));       // null
+println!("{:?}", get_first_vowel("try"));          // null
+
+}
 
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
-module.exports = getFirstVowel;
+// module.exports = getFirstVowel;
