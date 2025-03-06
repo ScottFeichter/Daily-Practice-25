@@ -1,0 +1,63 @@
+Sure! Here's a categorized list of Rust types:
+
+### **Primitive Types**
+#### 1. Scalar Types  
+- `bool` → `true` or `false`  
+- `char` → A single Unicode character (e.g., `'a'`, `'🦀'`)  
+- `str` (string slice) → Immutable sequence of characters (`&str`)  
+- Integer types:  
+  - Signed (`i8`, `i16`, `i32`, `i64`, `i128`, `isize`)  
+  - Unsigned (`u8`, `u16`, `u32`, `u64`, `u128`, `usize`)  
+- Floating-point types:  
+  - `f32`, `f64` (IEEE-754 floating-point numbers)  
+
+#### 2. Compound Types  
+- **Tuples** → Fixed-size heterogeneous collection (e.g., `(i32, f64, char)`)  
+- **Arrays** → Fixed-size homogeneous collection (`[i32; 5]`)  
+
+---
+
+### **Standard Library Types**
+#### 3. String Types  
+- `String` → Growable UTF-8 encoded string  
+- `&str` → String slice (immutable reference to a string)  
+
+#### 4. Collections (in `std::collections`)  
+- `Vec<T>` → Growable array (vector)  
+- `HashMap<K, V>` → Key-value store  
+- `HashSet<T>` → Unordered set of unique values  
+- `LinkedList<T>` → Doubly linked list  
+- `BinaryHeap<T>` → Priority queue  
+- `BTreeMap<K, V>` → Sorted key-value store  
+- `BTreeSet<T>` → Sorted set  
+
+#### 5. Option and Result (for error handling)  
+- `Option<T>` → Represents an optional value (`Some(T)` or `None`)  
+- `Result<T, E>` → Used for error handling (`Ok(T)` or `Err(E)`)  
+
+---
+
+### **Custom Types**
+#### 6. Structs (for defining custom data types)  
+- `struct` → Defines a structured data type  
+
+#### 7. Enums (for defining variants)  
+- `enum` → Represents multiple related variants  
+
+#### 8. Traits (for defining behavior)  
+- `trait` → Defines shared behavior across types  
+
+#### 9. Type Aliases  
+- `type MyType = u32;` → Creates an alias for an existing type  
+
+---
+
+### **Smart Pointers (in `std::rc` and `std::sync`)**  
+- `Box<T>` → Heap-allocated value  
+- `Rc<T>` → Reference-counted pointer (for single-threaded shared ownership)  
+- `Arc<T>` → Atomic reference-counted pointer (for multi-threaded shared ownership)  
+- `RefCell<T>` → Allows interior mutability  
+- `Mutex<T>` → Mutual exclusion lock (for safe concurrent access)  
+- `RwLock<T>` → Read-Write lock  
+
+This covers most Rust types—let me know if you need more details on any of them! 🚀

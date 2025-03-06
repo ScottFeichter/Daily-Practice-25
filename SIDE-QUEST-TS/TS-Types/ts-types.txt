@@ -1,0 +1,43 @@
+Sure! TypeScript has several built-in types. Here's a categorized list:
+
+### **Primitive Types**
+1. `string` – Represents text values.
+2. `number` – Represents integers and floating-point numbers.
+3. `boolean` – Represents `true` or `false`.
+4. `bigint` – Used for large integers (e.g., `BigInt(12345678901234567890)`).
+5. `symbol` – Unique identifiers.
+6. `null` – Represents the absence of a value.
+7. `undefined` – Represents an uninitialized variable.
+
+### **Object Types**
+8. `object` – Represents any non-primitive value.
+9. `Array<T>` – An array of elements of type `T` (e.g., `number[]`).
+10. `Tuple` – Fixed-size arrays with specific types (e.g., `[string, number]`).
+
+### **Function Types**
+11. `(param: type) => returnType` – Defines a function signature.
+
+### **Union and Intersection Types**
+12. `A | B` – Union type (e.g., `string | number`).
+13. `A & B` – Intersection type (e.g., combining types).
+
+### **Literal Types**
+14. Specific values as types (e.g., `"hello"`, `42`, `true`).
+
+### **Type Aliases & Interfaces**
+15. `type MyType = ...` – Defines a type alias.
+16. `interface MyInterface {}` – Defines an object structure.
+
+### **Utility and Special Types**
+17. `any` – Disables type checking.
+18. `unknown` – Like `any`, but safer (requires type checking).
+19. `never` – Represents unreachable code.
+20. `void` – Used for functions that don’t return a value.
+21. `readonly` – Marks properties as immutable.
+22. `Record<K, V>` – Creates an object type with keys `K` and values `V`.
+23. `Partial<T>` – Makes all properties of `T` optional.
+24. `Required<T>` – Makes all properties of `T` required.
+25. `Pick<T, K>` – Picks specific keys from `T`.
+26. `Omit<T, K>` – Omits specific keys from `T`.
+
+Let me know if you need more details on any of these! 🚀

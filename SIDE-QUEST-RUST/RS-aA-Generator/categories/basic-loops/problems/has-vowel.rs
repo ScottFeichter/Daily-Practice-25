@@ -6,11 +6,26 @@ otherwise.
 Vowels are the letters "a", "e", "i", "o", "u".
 */
 
-// Your code here 
+fn main() {
 
-// console.log(hasVowel('dog'));          // => true
-// console.log(hasVowel('conventional')); // => true
-// console.log(hasVowel('rhythm'));       // => false
+
+
+    fn has_vowel(stir: &str) -> bool {
+
+        stir.chars().any(|c| "aeiouAEIOU".contains(c))
+
+    }
+
+println!("{:?}", has_vowel("dog"));          // => true
+println!("{:?}", has_vowel("conventional")); // => true
+println!("{:?}", has_vowel("rhythm"));       // => false
+
+
+
+
+}
+
+
 
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
-module.exports = hasVowel;
+// module.exports = hasVowel;

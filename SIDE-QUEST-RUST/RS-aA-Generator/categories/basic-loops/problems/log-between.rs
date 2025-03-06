@@ -6,9 +6,14 @@ high number, inclusive. Inclusive means that the range includes the low and
 high numbers.
 */
 
-// Your code here 
+// Your code here
 
-// logBetween(-1, 2);
+fn main() {
+
+    log_between(-1, 2);
+}
+
+
 /* prints out:
 -1
 0
@@ -17,4 +22,4 @@ high numbers.
 */
 
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
-module.exports = logBetween;
+// module.exports = logBetween;

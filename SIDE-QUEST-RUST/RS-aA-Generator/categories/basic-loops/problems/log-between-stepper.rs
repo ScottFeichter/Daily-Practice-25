@@ -9,9 +9,24 @@ HINT: This function only needs to print using console.log it does not need to
 return anything.
 */
 
-// Your code here 
+fn main() {
 
-// logBetweenStepper(5, 9, 1);
+    fn log_between_stepper(num1: i32, num2: i32, num3: usize) {
+
+        for i in (num1..=num2).step_by(num3) {
+                println!("{:?}", i);
+
+            }
+        }
+
+
+
+    log_between_stepper(5, 9, 1);
+
+
+}
+
+
 /* prints out:
 5
 6
@@ -21,4 +36,4 @@ return anything.
 */
 
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
-module.exports = logBetweenStepper;
+// module.exports = logBetweenStepper;

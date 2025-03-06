@@ -9,17 +9,34 @@ For example, since 64 = 8 * 8 and 144 = 12 * 12, 64 and 144 are perfect squares;
 35 is not a perfect square.
 */
 
-// Your code here 
+// Your code here
+fn main() {
 
-// console.log(isPerfectSquare(1))     // true
-// console.log(isPerfectSquare(4))     // true
-// console.log(isPerfectSquare(64))    // true
-// console.log(isPerfectSquare(100))   // true
-// console.log(isPerfectSquare(169))   // true
-// console.log(isPerfectSquare(2))     // false
-// console.log(isPerfectSquare(40))    // false
-// console.log(isPerfectSquare(32))    // false
-// console.log(isPerfectSquare(50))    // false
+
+    fn is_perfect_square(num: i32) -> bool {
+        if num == 1 { return true };
+
+        for i in 1..=(num/2) {
+            if i * i == num {
+                return true;
+            }
+        }
+      return false;
+    }
+
+    println!("{}", is_perfect_square(1));    // true
+    println!("{}", is_perfect_square(4));     // true
+    println!("{}", is_perfect_square(64));    // true
+    println!("{}", is_perfect_square(100));   // true
+    println!("{}", is_perfect_square(169));   // true
+    println!("{}", is_perfect_square(2));     // false
+    println!("{}", is_perfect_square(40));    // false
+    println!("{}", is_perfect_square(32));    // false
+    println!("{}", is_perfect_square(50));    // false
+
+
+}
+
 
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
-module.exports = isPerfectSquare;
+// module.exports = isPerfectSquare;

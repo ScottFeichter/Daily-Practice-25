@@ -4,11 +4,26 @@ arguments. The functions should return the smallest number that is divisible by
 both num1 and num2.
 */
 
-// Your code here 
+fn main() {
 
-// console.log(leastCommonMultiple(4, 6)); // 12
-// console.log(leastCommonMultiple(3, 5)); // 15
-// console.log(leastCommonMultiple(2, 10)); // 10
+    fn least_common_multiple(num1: i32, num2: i32) -> i32 {
+
+        for i in 2..i32::MAX {
+            if i % num1 == 0 && i % num2 == 0 {
+                return i
+            }
+        }
+      return 0;
+    }
+
+
+    println!("{:?}", least_common_multiple(4, 6)); // 12
+    println!("{:?}", least_common_multiple(3, 5)); // 15
+    println!("{:?}", least_common_multiple(2, 10)); // 10
+
+}
+
+
 
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
-module.exports = leastCommonMultiple;
+// module.exports = leastCommonMultiple;
