@@ -6,29 +6,21 @@ not a string, say someone passes in a number as an argument, then return null.
 
 Vowels are the letters "a", "e", "i", "o", "u".
 */
-
-
-
-
-const reverb = (word: any): string | null => {
-  if(typeof word !== "string") return null;
-
-  const vowels = "aeiouAEIOU";
-
-  for(let i = word.length - 1; i >= 0; i--){
-    if(vowels.includes(word[i])) {
-      return word+word.slice(i);
+var reverb = function (word) {
+    if (typeof word !== "string")
+        return null;
+    var vowels = "aeiouAEIOU";
+    for (var i = word.length - 1; i >= 0; i--) {
+        if (vowels.includes(word[i])) {
+            return word + word.slice(i);
+        }
     }
-  }
-
-  return "word has no vowels";
-}
-
+    return "word has no vowels";
+};
 console.log(reverb('running')); // runninging
-console.log(reverb('FAMILY'));  // FAMILYILY
-console.log(reverb('trash'));   // trashash
-console.log(reverb('DISH'));    // DISHISH
-console.log(reverb(197393));    // null
-
+console.log(reverb('FAMILY')); // FAMILYILY
+console.log(reverb('trash')); // trashash
+console.log(reverb('DISH')); // DISHISH
+console.log(reverb(197393)); // null
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
 module.exports = reverb;

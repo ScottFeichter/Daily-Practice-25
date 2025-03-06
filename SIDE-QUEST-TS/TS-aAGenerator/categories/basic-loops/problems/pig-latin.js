@@ -15,26 +15,23 @@ So the two rules for our version of Pig Latin are:
 2. For words that start with a non-vowel, move all letters that come **before
    the first vowel** to the **end of the word** then add 'ay'
 */
-
-function pigLatinWord(word: string): string {
-    const vowels = "aeiouAEIOU";
-
-    if(vowels.includes(word[0])) {
-        return word+="yay"
+function pigLatinWord(word) {
+    var vowels = "aeiouAEIOU";
+    if (vowels.includes(word[0])) {
+        return word += "yay";
     }
-
-    for(let i = 0; i < word.length; i++) {
-        if(vowels.includes(word[i])) {
-            return word.slice(i)+word.slice(0, i)+"ay";
+    for (var i = 0; i < word.length; i++) {
+        if (vowels.includes(word[i])) {
+            var nuBeg = word.slice(i);
+            var nuEnd = word.slice(0, i) + "ay";
+            return word.slice(i) + word.slice(0, i) + "ay";
         }
     }
-    return "otnay applicableay";
-};
-
+}
+;
 console.log(pigLatinWord("apple")); //=> "appleyay"
 console.log(pigLatinWord("eat")); //=> "eatyay"
 console.log(pigLatinWord("banana")); //=> "ananabay"
 console.log(pigLatinWord("trash")); //=> "ashtray"
-
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
 module.exports = pigLatinWord;
