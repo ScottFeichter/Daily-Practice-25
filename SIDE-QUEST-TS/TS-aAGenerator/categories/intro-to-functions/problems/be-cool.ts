@@ -4,11 +4,16 @@ returns a sentence saying that the given string "is cool!". For example, if
 the first argument to beCool is "Mary", then the function should return
 "Mary is cool!"
 */
-var beCool = function (word) {
-    return word + " is cool!";
-};
-console.log(beCool("Music")); // "Music is cool!"
+
+const beCool = (word: string): string => {
+
+  return word+" is cool!";
+
+}
+
+console.log(beCool("Music"));      // "Music is cool!"
 console.log(beCool("JavaScript")); // "JavaScript is cool!"
-console.log(beCool("The world")); // "The world is cool!"
+console.log(beCool("The world"));  // "The world is cool!"
+
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
 module.exports = beCool;

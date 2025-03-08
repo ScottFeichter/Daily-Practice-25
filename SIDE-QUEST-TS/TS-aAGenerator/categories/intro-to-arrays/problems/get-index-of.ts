@@ -5,18 +5,20 @@ in the array, the function should return the first index of the target element
 in the array. If it's not in the array, the function should return -1. Solve
 this using a loop.
 */
-var getIndexOf = function (arr, target) {
-    if (arr.includes(target)) {
-        return arr.indexOf(target);
-    }
-    else
-        return -1;
-};
+
+
+const getIndexOf = (arr: any[], target: any): number => {
+  if(arr.includes(target)) {
+    return arr.indexOf(target);
+  } else return -1;
+}
+
 console.log(getIndexOf(['a', 'b', 'c', 'e'], 'c')); // 2
 console.log(getIndexOf(['a', 'b', 'c', 'e'], 'e')); // 3
 console.log(getIndexOf(['a', 'b', 'c', 'e'], 'z')); // -1
-console.log(getIndexOf([43, -7, 11, 13, 43], 43)); // 0
-console.log(getIndexOf([43, -7, 11, 13], 1)); // -1
-console.log(getIndexOf([], 3)); // -1
+console.log(getIndexOf([43, -7, 11, 13, 43], 43));  // 0
+console.log(getIndexOf([43, -7, 11, 13], 1));       // -1
+console.log(getIndexOf([], 3));                     // -1
+
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
 module.exports = getIndexOf;

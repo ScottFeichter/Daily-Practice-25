@@ -10,6 +10,14 @@ high numbers.
 
 fn main() {
 
+    fn log_between(low: i32, high: i32) {
+
+        for i in low..=high {
+            println!("{:?}", i);
+        }
+
+    }
+
     log_between(-1, 2);
 }
 

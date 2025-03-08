@@ -7,13 +7,33 @@ not a string, say someone passes in a number as an argument, then return null.
 Vowels are the letters "a", "e", "i", "o", "u".
 */
 
-// Your code here 
+fn main() {
 
-// console.log(reverb('running')); // runninging
-// console.log(reverb('FAMILY'));  // FAMILYILY
-// console.log(reverb('trash'));   // trashash
-// console.log(reverb('DISH'));    // DISHISH
-// console.log(reverb(197393));    // null
+
+    fn reverb(s: &str) -> Option<String> {
+
+        let vowels = ['a', 'e', 'i', 'o', 'u'];
+        let mut result = String::new();
+
+        for ch in s.chars().rev() {
+            if vowels.contains(ch) {
+                
+            }
+        }
+
+
+    }
+
+    println!("{:?}", reverb("running")); // runninging
+    println!("{:?}", reverb("FAMILY"));  // FAMILYILY
+    println!("{:?}", reverb("trash"));   // trashash
+    println!("{:?}", reverb("DISH"));    // DISHISH
+    println!("{:?}", reverb(197393));    // null
+
+
+}
+
+
 
 /******************** DO NOT MODIFY ANY CODE BELOW THIS LINE *****************/
 module.exports = reverb;
