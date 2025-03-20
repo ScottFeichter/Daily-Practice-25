@@ -1,0 +1,10 @@
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/PARD-Babal/todo-rs/target/debug/deps/libr2d2-a3bb5830718755d6.rmeta: /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/config.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/event.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/extensions.rs
+
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/PARD-Babal/todo-rs/target/debug/deps/libr2d2-a3bb5830718755d6.rlib: /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/config.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/event.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/extensions.rs
+
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/PARD-Babal/todo-rs/target/debug/deps/r2d2-a3bb5830718755d6.d: /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/config.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/event.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/extensions.rs
+
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/lib.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/config.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/event.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-6f17d22bba15001f/r2d2-0.8.10/src/extensions.rs:
