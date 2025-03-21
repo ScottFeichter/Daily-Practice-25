@@ -1,26 +1,26 @@
-use std::sync::Arc;
+use std::sync::Arc; // Arc is used to share ownership of the db connection pool across multiple handlers safely
 
 use axum::{
-    extract::State,
+    extract::State, // extracts global state (ie the DB connection pool)
     http::StatusCode,
     Json,
 };
 use axum::extract::Path;
-use diesel::prelude::*;
+use diesel::prelude::*; // imports Diesel's query builder and ORM functionality
 use diesel::r2d2;
 use diesel::r2d2::ConnectionManager;
-use crate::models::{NewTodo, Todo, UpdateTodo};
-use crate::schema::todos;
-use crate::schema::todos::id;
+use crate::models::{NewTodo, Todo, UpdateTodo}; // import models
+use crate::schema::todos; // import todos table
+use crate::schema::todos::id; // import the id column from the todos table
 
-pub type DbPool = Arc<r2d2::Pool<ConnectionManager<PgConnection>>>;
+pub type DbPool = Arc<r2d2::Pool<ConnectionManager<PgConnection>>>; // define DbPool as a shared reference type...
 
 
 pub async fn create_todo(
     State(db): State<DbPool>,
     Json(new_todo): Json<NewTodo>,
 ) -> (StatusCode,Json<Todo>) {
-    let mut conn = db.get().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR).unwrap();
+    let mut conn = db.get().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR).unwrap(); // makes connection to database
 
     let todo = diesel::insert_into(todos::table)
         .values(&new_todo)
