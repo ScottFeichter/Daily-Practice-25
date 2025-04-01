@@ -1,0 +1,10 @@
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/pard-4-1-25/target/debug/deps/libversion_check-924408caddcfebba.rmeta: /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/version.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/channel.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/date.rs
+
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/pard-4-1-25/target/debug/deps/libversion_check-924408caddcfebba.rlib: /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/version.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/channel.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/date.rs
+
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/pard-4-1-25/target/debug/deps/version_check-924408caddcfebba.d: /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/version.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/channel.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/date.rs
+
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/lib.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/version.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/channel.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5/src/date.rs:

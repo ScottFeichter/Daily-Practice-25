@@ -1,0 +1,8 @@
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/pard-4-1-25/target/debug/deps/libthread_local-fe1f502252dae58f.rmeta: /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/cached.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/thread_id.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/unreachable.rs
+
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/pard-4-1-25/target/debug/deps/thread_local-fe1f502252dae58f.d: /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/cached.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/thread_id.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/unreachable.rs
+
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/lib.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/cached.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/thread_id.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thread_local-1.1.8/src/unreachable.rs:

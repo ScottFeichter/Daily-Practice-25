@@ -1,0 +1,9 @@
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/pard-4-1-25/target/debug/deps/libyaml_rust-818448d221dfebe2.rmeta: /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/emitter.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/parser.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/scanner.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/yaml.rs
+
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/pard-4-1-25/target/debug/deps/yaml_rust-818448d221dfebe2.d: /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/emitter.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/parser.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/scanner.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/yaml.rs
+
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/lib.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/emitter.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/parser.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/scanner.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust-0.4.5/src/yaml.rs:
