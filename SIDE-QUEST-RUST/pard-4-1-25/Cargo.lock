@@ -1905,6 +1905,7 @@ dependencies = [
  "dotenvy",
  "jsonwebtoken",
  "pq-sys",
+ "rand",
  "serde",
  "serde_json",
  "thiserror 2.0.12",

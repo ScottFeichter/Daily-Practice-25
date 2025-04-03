@@ -485,7 +485,7 @@ Axum is compatible to work with tokio as well.
 
 
 
-### `main.rs`
+## `main.rs`
 
 The `main.rs` file will be where you initialize your Axum application.
 
@@ -664,25 +664,418 @@ axum::serve(listener, app.into_make_service())
 
 Don't forget the closing bracket to close the main function.
 
+The server should run and listen using the socket it was assigned to:
 
-
-
-
-Add the `cookie-parser` middleware for parsing cookies and the `Axum.json`
-middleware for parsing JSON bodies of requests with `Content-Type` of
-`"application/json"`.
-
-```js
-app.use(cookieParser());
-app.use(Axum.json());
+```rust
+cargo run
 ```
 
-Add several security middlewares:
+Ignore any warnings for now and open the browser to the socket address:
 
-1. Only allow CORS (Cross-Origin Resource Sharing) in development using the
+```
+http://127.0.0.1:5678
+```
+You should see "Hello, World!" in the browser!
+
+
+### `Middleware`
+
+## `Cookie`
+
+In Axum, cookie handling is built into the framework.
+
+In main.rs modify the axum import with the axum::extract::Cookie extractor and axum::response::AppendHeaders for setting cookies.
+
+You don't need a separate middleware like Express's cookie-parser.
+
+But you will need to create handlers and add them to the routes:
+
+```rust
+
+    // Build our application with routes
+    let app = Router::new()
+        .route("/", get(root))
+        .route("/health", get(health_check))
+        .route("/set-cookie", get(set_cookie))
+        .route("/read-cookie", get(read_cookie))
+        .with_state(shared_state);
+
+
+
+// New cookie handlers
+async fn set_cookie() -> impl IntoResponse {
+    AppendHeaders([
+        ("Set-Cookie", "session=abc123; HttpOnly; Path=/")
+    ])
+}
+
+async fn read_cookie(cookie: Option<Cookie>) -> impl IntoResponse {
+    match cookie {
+        Some(cookie) => format!("Cookie value: {}", cookie.value()),
+        None => "No cookie found".to_string(),
+    }
+}
+```
+
+Here's how your new main.rs should look:
+
+```rust
+use diesel::prelude::*;
+use diesel::r2d2::{self, ConnectionManager, Pool};
+use dotenvy::dotenv;
+use std::sync::Arc;
+
+mod db;
+mod config;
+
+use config::Config;
+
+use axum::{
+    routing::{get, post},
+    Router,
+    extract::{State, Cookie},
+    response::{AppendHeaders, IntoResponse},
+};
+use std::net::SocketAddr;
+
+#[macro_use]
+extern crate diesel;
+pub mod models;
+pub mod schema;
+
+// Define AppState to hold shared state
+pub struct AppState {
+    pub db_pool: Pool<ConnectionManager<PgConnection>>,
+}
+
+// Create a type alias for convenience
+type AppStateShare = Arc<AppState>;
+
+#[tokio::main]
+async fn main() {
+    // Load .env file
+    dotenv().ok();
+
+    // Access environment variables
+    let config: Config = Config::new().expect("Failed to load configuration");
+
+    // Set up connection pool
+    let manager = ConnectionManager::<PgConnection>::new(&config.database_url);
+    let pool = Pool::builder()
+        .build(manager)
+        .expect("Failed to create pool");
+
+    // Create shared state
+    let shared_state = Arc::new(AppState {
+        db_pool: pool,
+    });
+
+    // Initialize tracing for logging
+    tracing_subscriber::fmt::init();
+
+    // Build our application with routes
+    let app = Router::new()
+        .route("/", get(root))
+        .route("/health", get(health_check))
+        .route("/set-cookie", get(set_cookie))
+        .route("/read-cookie", get(read_cookie))
+        .with_state(shared_state);
+
+    // Run the server
+    let addr = SocketAddr::from(([127, 0, 0, 1], 5678));
+    println!("Server running on http://{}", addr);
+
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    axum::serve(listener, app.into_make_service())
+        .await
+        .unwrap();
+}
+
+// Example of a handler using state
+async fn root(
+    State(state): State<AppStateShare>,
+    cookie: Option<Cookie>,
+) -> impl IntoResponse {
+    // You can now access both state and cookies
+    "Hello, World!"
+}
+
+// Health check endpoint
+async fn health_check() -> &'static str {
+    "OK"
+}
+
+// New cookie handlers
+async fn set_cookie() -> impl IntoResponse {
+    AppendHeaders([
+        ("Set-Cookie", "session=abc123; HttpOnly; Path=/")
+    ])
+}
+
+async fn read_cookie(cookie: Option<Cookie>) -> impl IntoResponse {
+    match cookie {
+        Some(cookie) => format!("Cookie value: {}", cookie.value()),
+        None => "No cookie found".to_string(),
+    }
+}
+
+```
+
+For more complex cookie operations, you can use the cookie crate (which you already have in your dependencies). Here's an example:
+
+```rust
+use cookie::{Cookie as RawCookie, SameSite};
+
+async fn set_complex_cookie() -> impl IntoResponse {
+    let cookie = RawCookie::build("session", "value123")
+        .path("/")
+        .secure(true)
+        .http_only(true)
+        .same_site(SameSite::Strict)
+        .finish();
+
+    AppendHeaders([
+        ("Set-Cookie", cookie.to_string())
+    ])
+}
+```
+
+
+## `JSON`
+
+In Axum, JSON handling is built-in through extractors.
+
+Add Json to the Axum import in main.rs:
+
+```rust
+use axum::{
+    routing::{post, get},
+    Json,
+    Router,
+};
+```
+
+Use the Json extractor directly in your route handlers.
+
+Here's an example how to handle JSON:
+
+```rust
+// Handler that receives JSON
+async fn create_user(
+    Json(payload): Json<User>
+) -> impl IntoResponse {
+    // payload is now a User struct
+    println!("Received user: {} {}", payload.name, payload.email);
+
+    // Return JSON response
+    Json(User {
+        name: payload.name,
+        email: payload.email,
+    })
+}
+
+// In your router setup:
+let app = Router::new()
+    .route("/users", post(create_user));
+
+// Shell
+curl -X POST -H "Content-Type: application/json" -d '{"name":"John","email":"john@example.com"}' http://localhost:5678/users
+
+```
+
+
+
+## `CORS`
+
+In Axum, CORS is handled through the tower-http crate's CorsLayer.
+
+We only allow CORS (Cross-Origin Resource Sharing) in development using the
 `cors` middleware because the React frontend will be served from a different
-server than the Axum server. CORS isn't needed in production since all of our
-React and Axum resources will come from the same origin.
+server than the Axum server.
+
+CORS isn't needed in production since all of our React and Axum resources will come from the same origin.
+
+Based on the project structure and dependencies, here's how to implement CORS:
+
+```rust
+use diesel::prelude::*;
+use diesel::r2d2::{self, ConnectionManager, Pool};
+use dotenvy::dotenv;
+use std::sync::Arc;
+
+mod db;
+mod config;
+
+use config::Config;
+
+use axum::{
+    routing::{get, post},
+    Router,
+    extract::State,
+    http::{Method, HeaderName, header, HeaderValue},
+};
+use std::net::SocketAddr;
+
+use tower_http::cors::{CorsLayer, Any};
+
+
+#[macro_use]
+extern crate diesel;
+pub mod models;
+pub mod schema;
+
+// Define AppState to hold shared state
+pub struct AppState {
+    pub db_pool: Pool<ConnectionManager<PgConnection>>,
+}
+
+// Create a type alias for convenience
+type AppStateShare = Arc<AppState>;
+
+#[tokio::main]
+async fn main() {
+    // Load .env file
+    dotenv().ok();
+
+    // Access environment variables
+    let config: Config = Config::new().expect("Failed to load configuration");
+
+    // Get environment
+    let environment = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
+
+
+    println!("environment: {:?}", environment);
+
+
+    // Configure CORS based on environment
+    let cors = if environment == "production" {
+        CorsLayer::new()
+            .allow_origin("https://your-production-domain.com".parse::<HeaderValue>().unwrap())
+            .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
+            .allow_headers([
+                HeaderName::from_static("content-type"),
+                HeaderName::from_static("authorization"),
+            ])
+            .allow_credentials(true)
+    } else {
+        // Development CORS settings
+        CorsLayer::new()
+            .allow_origin("http://127.0.0.1:5678".parse::<HeaderValue>().unwrap())
+            .allow_methods([
+                Method::GET,
+                Method::POST,
+                Method::PATCH,
+                Method::DELETE,
+                Method::OPTIONS,
+            ])
+            .allow_headers([
+                HeaderName::from_static("content-type"),
+                HeaderName::from_static("authorization"),
+                HeaderName::from_static("accept"),
+            ])
+            .allow_credentials(true)
+    };
+
+
+    // Set up connection pool
+    let manager = ConnectionManager::<PgConnection>::new(&config.database_url);
+    let pool = Pool::builder()
+        .build(manager)
+        .expect("Failed to create pool");
+
+    // Create shared state
+    let shared_state = Arc::new(AppState {
+        db_pool: pool,
+    });
+
+    // Initialize tracing for logging
+    tracing_subscriber::fmt::init();
+
+    // Build our application with routes and add CORS
+    let app = Router::new()
+        .route("/", get(root))
+        .route("/health", get(health_check))
+        .with_state(shared_state)
+        .layer(cors); // Add the CORS middleware here
+
+    // Run the server
+    let addr = SocketAddr::from(([127, 0, 0, 1], 5678));
+    println!("Server running on http://{}", addr);
+
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    axum::serve(listener, app.into_make_service())
+        .await
+        .unwrap();
+}
+
+// Example of a handler using state
+async fn root(State(state): State<AppStateShare>) -> &'static str {
+    // You can now use state.db_pool to get a connection when needed
+    "Hello, World!"
+}
+
+// Health check endpoint
+async fn health_check() -> &'static str {
+    "OK"
+}
+```
+
+We can test these using either fetches in the browser:
+
+```javascript
+// Test GET request to root
+fetch('http://localhost:5678/', {
+  method: 'GET',
+  credentials: 'include', // necessary for CORS with credentials
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+.then(response => response.text())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));
+
+// Test health check endpoint
+fetch('http://localhost:5678/health', {
+  method: 'GET',
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+.then(response => response.text())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));
+```
+
+We can also test this from the command line with curl:
+
+```shell
+# Test GET request to root
+curl -X GET http://localhost:5678/ \
+  -H "Content-Type: application/json" \
+  -H "Origin: http://localhost:5173"
+
+# Test health check endpoint
+curl -X GET http://localhost:5678/health \
+  -H "Content-Type: application/json" \
+  -H "Origin: http://localhost:5173"
+
+# Test CORS preflight request
+curl -X OPTIONS http://localhost:5678/ \
+  -H "Origin: http://localhost:5173" \
+  -H "Access-Control-Request-Method: GET" \
+  -H "Access-Control-Request-Headers: content-type" \
+  -v
+```
+
+
+
+## `CORS`
+
+
+
+
 2. Enable better overall security with the `helmet` middleware (for more on what
 `helmet` is doing, see [helmet on the `npm` registry]). React is generally safe
 at mitigating XSS (i.e., [Cross-Site Scripting]) attacks, but do be sure to
@@ -690,6 +1083,9 @@ research how to protect your users from such attacks in React when deploying a
 large production application. Now add the `crossOriginResourcePolicy` to the
 `helmet` middleware with a `policy` of `cross-origin`. This will allow images
 with URLs to render in deployment.
+
+## `CSURF`
+
 3. Add the `csurf` middleware and configure it to use cookies.
 
 ```js

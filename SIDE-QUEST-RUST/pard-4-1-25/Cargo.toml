@@ -39,5 +39,9 @@ thiserror = "2.0.12"                                                        # Er
 chrono = { version = "0.4", features = ["serde"] }
 
 
+rand = "0.8"
+
+
+
 [dev-dependencies]
 cargo-watch = "8.5.3"                                                       # Equivalent to nodemon

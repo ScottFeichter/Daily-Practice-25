@@ -9,34 +9,75 @@ mod config;
 use config::Config;
 
 use axum::{
-    routing::{get, post},
+    middleware::from_fn,
+    routing::get,
     Router,
     extract::State,
+    http::{Method, HeaderName, HeaderValue},
 };
 use std::net::SocketAddr;
+
+use tower_http::cors::CorsLayer;
+
+use std::error::Error as StdError;
+
+mod middleware;
+use middleware::csrf::csrf_middleware;
 
 #[macro_use]
 extern crate diesel;
 pub mod models;
 pub mod schema;
 
-
-
-// Define AppState to hold shared state
+// Define the application state
 pub struct AppState {
     pub db_pool: Pool<ConnectionManager<PgConnection>>,
 }
 
-// Create a type alias for convenience
+// Type alias for shared state
 type AppStateShare = Arc<AppState>;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn StdError>> {
     // Load .env file
     dotenv().ok();
 
     // Access environment variables
     let config: Config = Config::new().expect("Failed to load configuration");
+
+    // Get environment
+    let environment = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
+
+    println!("environment: {:?}", environment);
+
+    // Configure CORS based on environment
+    let cors = if environment == "production" {
+        CorsLayer::new()
+            .allow_origin("https://your-production-domain.com".parse::<HeaderValue>().unwrap())
+            .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
+            .allow_headers([
+                HeaderName::from_static("content-type"),
+                HeaderName::from_static("authorization"),
+            ])
+            .allow_credentials(true)
+    } else {
+        // Development CORS settings
+        CorsLayer::new()
+            .allow_origin("http://127.0.0.1:5678".parse::<HeaderValue>().unwrap())
+            .allow_methods([
+                Method::GET,
+                Method::POST,
+                Method::PATCH,
+                Method::DELETE,
+                Method::OPTIONS,
+            ])
+            .allow_headers([
+                HeaderName::from_static("content-type"),
+                HeaderName::from_static("authorization"),
+                HeaderName::from_static("accept"),
+            ])
+            .allow_credentials(true)
+    };
 
     // Set up connection pool
     let manager = ConnectionManager::<PgConnection>::new(&config.database_url);
@@ -52,25 +93,27 @@ async fn main() {
     // Initialize tracing for logging
     tracing_subscriber::fmt::init();
 
-    // Build our application with routes
+    // Build our application with routes and add CORS
     let app = Router::new()
         .route("/", get(root))
         .route("/health", get(health_check))
-        .with_state(shared_state);
+        .with_state(shared_state)
+        .layer(cors)
+        .layer(from_fn(csrf_middleware));
 
     // Run the server
     let addr = SocketAddr::from(([127, 0, 0, 1], 5678));
     println!("Server running on http://{}", addr);
 
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app.into_make_service())
-        .await
-        .unwrap();
+        .await?;
+
+    Ok(())
 }
 
 // Example of a handler using state
-async fn root(State(state): State<AppStateShare>) -> &'static str {
-    // You can now use state.db_pool to get a connection when needed
+async fn root(_state: State<AppStateShare>) -> &'static str {
     "Hello, World!"
 }
 
