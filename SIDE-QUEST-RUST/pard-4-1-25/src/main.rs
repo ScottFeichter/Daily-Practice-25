@@ -12,7 +12,7 @@ use axum::{
     middleware::from_fn,
     routing::get,
     Router,
-    extract::{State, Cookie},
+    extract::{State},
     response::{AppendHeaders, IntoResponse},
     http::{Method, HeaderName, HeaderValue, header},
 };
