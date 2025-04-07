@@ -12,8 +12,9 @@ use axum::{
     middleware::from_fn,
     routing::get,
     Router,
-    extract::State,
-    http::{Method, HeaderName, HeaderValue},
+    extract::{State, Cookie},
+    response::{AppendHeaders, IntoResponse},
+    http::{Method, HeaderName, HeaderValue, header},
 };
 use std::net::SocketAddr;
 
@@ -21,8 +22,12 @@ use tower_http::cors::CorsLayer;
 
 use std::error::Error as StdError;
 
+
 mod middleware;
+use middleware::cors::create_cors_layer;
 use middleware::csrf::csrf_middleware;
+use middleware::cookies::{cookie_layer, protected_route};
+
 
 #[macro_use]
 extern crate diesel;
@@ -46,66 +51,42 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     let config: Config = Config::new().expect("Failed to load configuration");
 
     // Get environment
-    let environment = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
-
+    let environment: String = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
     println!("environment: {:?}", environment);
 
-    // Configure CORS based on environment
-    let cors = if environment == "production" {
-        CorsLayer::new()
-            .allow_origin("https://your-production-domain.com".parse::<HeaderValue>().unwrap())
-            .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
-            .allow_headers([
-                HeaderName::from_static("content-type"),
-                HeaderName::from_static("authorization"),
-            ])
-            .allow_credentials(true)
-    } else {
-        // Development CORS settings
-        CorsLayer::new()
-            .allow_origin("http://127.0.0.1:5678".parse::<HeaderValue>().unwrap())
-            .allow_methods([
-                Method::GET,
-                Method::POST,
-                Method::PATCH,
-                Method::DELETE,
-                Method::OPTIONS,
-            ])
-            .allow_headers([
-                HeaderName::from_static("content-type"),
-                HeaderName::from_static("authorization"),
-                HeaderName::from_static("accept"),
-            ])
-            .allow_credentials(true)
-    };
+    // Create Cors layer
+    let cors: CorsLayer = create_cors_layer(&environment);
 
     // Set up connection pool
-    let manager = ConnectionManager::<PgConnection>::new(&config.database_url);
-    let pool = Pool::builder()
+    let manager: ConnectionManager<PgConnection> = ConnectionManager::<PgConnection>::new(&config.database_url);
+    let pool: Pool<ConnectionManager<PgConnection>> = Pool::builder()
         .build(manager)
         .expect("Failed to create pool");
 
     // Create shared state
-    let shared_state = Arc::new(AppState {
+    let shared_state: Arc<AppState> = Arc::new(AppState {
         db_pool: pool,
     });
 
     // Initialize tracing for logging
     tracing_subscriber::fmt::init();
 
-    // Build our application with routes and add CORS
-    let app = Router::new()
+    // Build our application with routes and add middleware
+    let app: Router = Router::new()
         .route("/", get(root))
         .route("/health", get(health_check))
+        .route("/protected", get(protected_route))
         .with_state(shared_state)
         .layer(cors)
+        .layer(cookie_layer())
         .layer(from_fn(csrf_middleware));
 
     // Run the server
-    let addr = SocketAddr::from(([127, 0, 0, 1], 5678));
+    let addr: SocketAddr = SocketAddr::from(([127, 0, 0, 1], 5678));
     println!("Server running on http://{}", addr);
 
-    let listener = tokio::net::TcpListener::bind(addr).await?;
+    // Create the listener
+    let listener: tokio::net::TcpListener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app.into_make_service())
         .await?;
 

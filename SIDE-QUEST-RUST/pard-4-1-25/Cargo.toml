@@ -21,6 +21,7 @@ jsonwebtoken = "9.3.1"                                                      # JW
 
 tower = "0.4"
 
+
 tower-http = { version = "0.6.2", features = [                              # provides HTTP-specific middleware and utilities built on top of tower
     "catch-panic",                                                          # Convert panics into responses.
     "cors",                                                                 # CORS middleware
@@ -40,6 +41,7 @@ chrono = { version = "0.4", features = ["serde"] }
 
 
 rand = "0.8"
+tower-cookies = "0.11.0"
 
 
 

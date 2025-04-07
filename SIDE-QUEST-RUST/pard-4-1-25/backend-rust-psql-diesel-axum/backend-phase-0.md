@@ -678,9 +678,28 @@ http://127.0.0.1:5678
 You should see "Hello, World!" in the browser!
 
 
-### `Middleware`
+## `Middleware`
 
-## `Cookie`
+### `Cookies`
+
+There are a few strategies for handling cookies.
+
+1. functionality built in to Axum
+
+    - The official extension from the Axum team, is minimal and works well for simple setups.
+
+2. cookie Crate
+
+    - For more complex cookies
+
+3. tower-cookies
+
+    - A middleware-based cookie manager for Axum & Tower, with easy read/write access and no manual jar passing.
+
+We'll cover each approach but recommend tower-cookies.
+<br>
+
+#### Axum For Cookies
 
 In Axum, cookie handling is built into the framework.
 
@@ -820,6 +839,10 @@ async fn read_cookie(cookie: Option<Cookie>) -> impl IntoResponse {
 }
 
 ```
+<br>
+
+#### cookie crate For Cookies
+
 
 For more complex cookie operations, you can use the cookie crate (which you already have in your dependencies). Here's an example:
 
@@ -839,7 +862,116 @@ async fn set_complex_cookie() -> impl IntoResponse {
     ])
 }
 ```
+<br>
 
+#### tower-cookies For Cookies
+
+You can also use tower-cookies which provides a more streamlined approach.
+
+First add the latest tower-cookies dependency to the cargo.toml:
+
+```shell
+cargo add tower-cookies
+```
+
+Create a folder called Middleware and then a file called cookies.rs with this code:
+
+```rust
+use tower_cookies::{CookieManagerLayer, Cookies, Cookie, Key};
+use axum::{response::IntoResponse, Json};
+use serde_json::json;
+
+/// Adds a signed cookie
+pub fn set_jwt_cookie(cookies: &Cookies, token: &str) {
+    let mut cookie = Cookie::build("jwt", token.to_string())
+        .path("/")
+        .http_only(true)
+        .secure(true)
+        .finish();
+
+    cookies.add(cookie);
+}
+
+/// Retrieves JWT from cookie
+pub fn set_jwt_cookie(cookies: &Cookies, token: &str) {
+    let mut cookie = Cookie::new("jwt", token.to_string());
+    cookie.set_path("/");
+    cookie.set_http_only(true);
+    cookie.set_secure(true);
+
+    cookies.add(cookie);
+}
+
+
+/// Example protected route using the jwt cookie
+pub async fn protected_route(cookies: Cookies) -> impl IntoResponse {
+    match get_jwt_cookie(&cookies) {
+        Some(token) => Json(json!({
+            "success": true,
+            "token": token
+        })),
+        None => Json(json!({
+            "success": false,
+            "message": "Unauthorized"
+        })).into_response(),
+    }
+}
+
+/// Expose cookie middleware layer
+pub fn cookie_layer() -> CookieManagerLayer {
+    CookieManagerLayer::new()
+}
+
+```
+In the Middleware folder add a mod.rs and add the import/export:
+
+```rust
+pub mod cookies;
+```
+
+Then in main.rs add the import:
+
+```rust
+use middleware::cookies::{cookie_layer, protected_route};
+```
+Then in main.rs add the handlers to the router:
+
+```rust
+    let app: Router = Router::new()
+        .route("/", get(root))
+        .route("/health", get(health_check))
+        .route("/protected", get(protected_route))
+        .with_state(shared_state)
+        .layer(cookie_layer())
+```
+<br>
+
+#### Comparing Approaches For Cookies
+
+This last approach is recommended because it manages some cookie operations automatically:
+
+```text
+    - No need to pass `CookieJar`around in handlers — cookies are injected via extractor (`Cookies`).
+    - More convenient and ergonomic** for real-world apps (especially with multiple layers).
+    - Supports signed and private cookies with `Key`.
+    - Inspired by cookies in Express.js and Koa (intuitive for web devs coming from those).
+    - More middleware-friendly (cookies persist across all handlers/middleware automatically).
+```
+
+Here is a breakdown comparison of the approaches:
+
+```text
+    | Use Case                               | Use `tower-cookies` ✅ | Use `axum-extra::CookieJar` ✅|
+    |----------------------------------------|------------------------|-------------------------------|
+    | Full app with sessions/auth            | ✅ Yes                 | Maybe                         |
+    | Want ergonomic read/write cookies      | ✅ Yes                 | 👎 Manual                     |
+    | Only need simple read/set              | 👎 Overkill            | ✅ Yes                        |
+    | Stateless APIs, cookie just for flavor | 👎                     | ✅ Yes                        |
+    | Already using Axum extra extractors    | Maybe                  | ✅                            |
+    | Want auto cookie injection             | ✅ Yes                 | 👎                            |
+
+```
+<br>
 
 ## `JSON`
 
@@ -1071,7 +1203,7 @@ curl -X OPTIONS http://localhost:5678/ \
 
 
 
-## `CORS`
+## `Helmet`
 
 
 
@@ -1086,7 +1218,7 @@ with URLs to render in deployment.
 
 ## `CSURF`
 
-3. Add the `csurf` middleware and configure it to use cookies.
+Add the `csurf` middleware and configure it to use cookies.
 
 ```js
 // Security Middleware
