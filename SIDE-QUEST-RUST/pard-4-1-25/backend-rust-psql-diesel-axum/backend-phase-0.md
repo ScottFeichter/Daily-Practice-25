@@ -293,7 +293,9 @@ Each environment variable will be read and exported as a key from this file.
 
 Initialize Diesel in your project by runing this command in the root:
 
-```diesel setup```
+```shell
+diesel setup
+```
 
 This command will:
 - Create a migrations directory
@@ -307,7 +309,7 @@ Create your first migration by running this command in the root:
 diesel migration generate your_table_name
 ```
 
-This creates two files in migrations/[timestamp]_create_your_table/:
+This creates two files in migrations/[timestamp]_your_table_name/:
 - up.sql: Define your table schema
 - down.sql: Define how to revert the migration
 
@@ -531,7 +533,8 @@ type AppStateShare = Arc<AppState>;
 
 This provides shared ownership of a value across multiple threads, keeping track of the number of references to the data, and only deallocating the data when the last reference is drop.
 
-# fn main
+
+### fn main
 
 Before we initialize main we need to add the tokio decorator so we can use main as async:
 
@@ -562,6 +565,8 @@ Next we use Pool::builder() to create a connection pool with default settings:
         .expect("Failed to create pool");
 ```
 This establishes the pool with the databse URL from the manager.
+
+```NOTE: Now that we are using manager and pool we no longer need db.rs and the import mod db;```
 
 Next we again use ARC to create a thread-safe shared state containing the database connection pool:
 
@@ -947,7 +952,7 @@ This last approach is recommended because it manages some cookie operations auto
 
 ```text
     - No need to pass `CookieJar`around in handlers — cookies are injected via extractor (`Cookies`).
-    - More convenient and ergonomic** for real-world apps (especially with multiple layers).
+    - More convenient and ergonomic for real-world apps (especially with multiple layers).
     - Supports signed and private cookies with `Key`.
     - Inspired by cookies in Express.js and Koa (intuitive for web devs coming from those).
     - More middleware-friendly (cookies persist across all handlers/middleware automatically).
@@ -968,114 +973,25 @@ Here is a breakdown comparison of the approaches:
 ```
 <br>
 
-## `JSON`
-
-In Axum, JSON handling is built-in through extractors.
-
-Add Json to the Axum import in main.rs:
-
-```rust
-use axum::{
-    routing::{post, get},
-    Json,
-    Router,
-};
-```
-
-Use the Json extractor directly in your route handlers.
-
-Here's an example how to handle JSON:
-
-```rust
-// Handler that receives JSON
-async fn create_user(
-    Json(payload): Json<User>
-) -> impl IntoResponse {
-    // payload is now a User struct
-    println!("Received user: {} {}", payload.name, payload.email);
-
-    // Return JSON response
-    Json(User {
-        name: payload.name,
-        email: payload.email,
-    })
-}
-
-// In your router setup:
-let app = Router::new()
-    .route("/users", post(create_user));
-
-// Shell
-curl -X POST -H "Content-Type: application/json" -d '{"name":"John","email":"john@example.com"}' http://localhost:5678/users
-
-```
-
-
 
 ## `CORS`
 
 In Axum, CORS is handled through the tower-http crate's CorsLayer.
 
-We only allow CORS (Cross-Origin Resource Sharing) in development using the
-`cors` middleware because the React frontend will be served from a different
-server than the Axum server.
+We only allow CORS (Cross-Origin Resource Sharing) in development.
+
+The React frontend will be served from a different server than the Axum server.
 
 CORS isn't needed in production since all of our React and Axum resources will come from the same origin.
 
-Based on the project structure and dependencies, here's how to implement CORS:
+To begin we add to the middlware folder a file cors.rs:
 
 ```rust
-use diesel::prelude::*;
-use diesel::r2d2::{self, ConnectionManager, Pool};
-use dotenvy::dotenv;
-use std::sync::Arc;
+use axum::http::{HeaderName, HeaderValue, Method};
+use tower_http::cors::CorsLayer;
 
-mod db;
-mod config;
-
-use config::Config;
-
-use axum::{
-    routing::{get, post},
-    Router,
-    extract::State,
-    http::{Method, HeaderName, header, HeaderValue},
-};
-use std::net::SocketAddr;
-
-use tower_http::cors::{CorsLayer, Any};
-
-
-#[macro_use]
-extern crate diesel;
-pub mod models;
-pub mod schema;
-
-// Define AppState to hold shared state
-pub struct AppState {
-    pub db_pool: Pool<ConnectionManager<PgConnection>>,
-}
-
-// Create a type alias for convenience
-type AppStateShare = Arc<AppState>;
-
-#[tokio::main]
-async fn main() {
-    // Load .env file
-    dotenv().ok();
-
-    // Access environment variables
-    let config: Config = Config::new().expect("Failed to load configuration");
-
-    // Get environment
-    let environment = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
-
-
-    println!("environment: {:?}", environment);
-
-
-    // Configure CORS based on environment
-    let cors = if environment == "production" {
+pub fn create_cors_layer(environment: &str) -> CorsLayer {
+    if environment == "production" {
         CorsLayer::new()
             .allow_origin("https://your-production-domain.com".parse::<HeaderValue>().unwrap())
             .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
@@ -1085,7 +1001,6 @@ async fn main() {
             ])
             .allow_credentials(true)
     } else {
-        // Development CORS settings
         CorsLayer::new()
             .allow_origin("http://127.0.0.1:5678".parse::<HeaderValue>().unwrap())
             .allow_methods([
@@ -1101,53 +1016,28 @@ async fn main() {
                 HeaderName::from_static("accept"),
             ])
             .allow_credentials(true)
-    };
-
-
-    // Set up connection pool
-    let manager = ConnectionManager::<PgConnection>::new(&config.database_url);
-    let pool = Pool::builder()
-        .build(manager)
-        .expect("Failed to create pool");
-
-    // Create shared state
-    let shared_state = Arc::new(AppState {
-        db_pool: pool,
-    });
-
-    // Initialize tracing for logging
-    tracing_subscriber::fmt::init();
-
-    // Build our application with routes and add CORS
-    let app = Router::new()
-        .route("/", get(root))
-        .route("/health", get(health_check))
-        .with_state(shared_state)
-        .layer(cors); // Add the CORS middleware here
-
-    // Run the server
-    let addr = SocketAddr::from(([127, 0, 0, 1], 5678));
-    println!("Server running on http://{}", addr);
-
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app.into_make_service())
-        .await
-        .unwrap();
-}
-
-// Example of a handler using state
-async fn root(State(state): State<AppStateShare>) -> &'static str {
-    // You can now use state.db_pool to get a connection when needed
-    "Hello, World!"
-}
-
-// Health check endpoint
-async fn health_check() -> &'static str {
-    "OK"
+    }
 }
 ```
+Next we update the mod.rs in the Middleware folder with import/export:
 
-We can test these using either fetches in the browser:
+```rust
+pub mod cors;
+```
+Then add the import of the cors middleware and CorsLayer to main.rs:
+```rust
+use tower_http::cors::CorsLayer;
+
+mod middleware;
+use middleware::cors::create_cors_layer;
+```
+Finally add the layer to the router after shared state but before cookies:
+```rust
+.layer(cors)
+```
+
+
+We can test our root and health routes with fetches in the browser:
 
 ```javascript
 // Test GET request to root
@@ -1197,69 +1087,355 @@ curl -X OPTIONS http://localhost:5678/ \
 ```
 
 
-
-## `Helmet`
-
+## `Security Headers`
 
 
+Helmet is specifically for Node.js/Express applications.
 
-2. Enable better overall security with the `helmet` middleware (for more on what
-`helmet` is doing, see [helmet on the `npm` registry]). React is generally safe
-at mitigating XSS (i.e., [Cross-Site Scripting]) attacks, but do be sure to
-research how to protect your users from such attacks in React when deploying a
-large production application. Now add the `crossOriginResourcePolicy` to the
-`helmet` middleware with a `policy` of `cross-origin`. This will allow images
-with URLs to render in deployment.
+Therefore we use Axum's built-in middleware capabilities or Tower middleware to implement similar security headers.
+
+In Middleware folder create a security_headers.rs:
+
+```rust
+use axum::{
+    middleware::Next,
+    response::Response,
+    http::{Request, HeaderValue, header, HeaderName},
+    body::Body,
+};
+
+pub async fn security_headers(
+    request: Request<Body>,
+    next: Next,
+) -> Response {
+    let mut response = next.run(request).await;
+    let headers = response.headers_mut();
+
+    // Content Security Policy
+    headers.insert(
+        header::CONTENT_SECURITY_POLICY,
+        HeaderValue::from_static("default-src 'self'; script-src 'self'")
+    );
+
+    // XSS Protection
+    headers.insert(
+        header::X_XSS_PROTECTION,
+        HeaderValue::from_static("1; mode=block")
+    );
+
+    // X-Frame-Options
+    headers.insert(
+        header::X_FRAME_OPTIONS,
+        HeaderValue::from_static("DENY")
+    );
+
+    // X-Content-Type-Options
+    headers.insert(
+        header::X_CONTENT_TYPE_OPTIONS,
+        HeaderValue::from_static("nosniff")
+    );
+
+    // Referrer Policy
+    headers.insert(
+        header::REFERRER_POLICY,
+        HeaderValue::from_static("strict-origin-when-cross-origin")
+    );
+
+    // Strict-Transport-Security (HSTS)
+    headers.insert(
+        header::STRICT_TRANSPORT_SECURITY,
+        HeaderValue::from_static("max-age=31536000; includeSubDomains")
+    );
+
+    // Permissions Policy
+    headers.insert(
+        HeaderName::from_static("permissions-policy"),
+        HeaderValue::from_static(
+            "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+        )
+    );
+
+    response
+}
+```
+
+Update the mod.rs in the Middlware folder to include the import/export:
+
+```rust
+pub mod security_headers;
+```
+
+Add the import to main.rs:
+```rust
+use middleware::security_headers::security_headers;
+```
+
+Finally add the security_headers as a layer on the router in main.rs:
+
+```rust
+.layer(from_fn(security_headers));
+```
+
+<br>
+
+
 
 ## `CSURF`
 
-Add the `csurf` middleware and configure it to use cookies.
+To add csurf protection we need to add the rand crate to cargo toml:
 
-```js
-// Security Middleware
-if (!isProduction) {
-  // enable cors only in development
-  app.use(cors());
-}
-
-// helmet helps set a variety of headers to better secure your app
-app.use(
-  helmet.crossOriginResourcePolicy({
-    policy: "cross-origin"
-  })
-);
-
-// Set the _csrf token and create req.csrfToken method
-app.use(
-  csurf({
-    cookie: {
-      secure: isProduction,
-      sameSite: isProduction && "Lax",
-      httpOnly: true
-    }
-  })
-);
+```toml
+rand = 0.8
 ```
 
-The `csurf` middleware will add a `_csrf` cookie that is HTTP-only (can't be
-read by JavaScript) to any server response. It also adds a method on all
-requests (`req.csrfToken`) that will be set to another cookie (`XSRF-TOKEN`)
-later on. These two cookies work together to provide CSRF (Cross-Site Request
-Forgery) protection for your application. The `XSRF-TOKEN` cookie value needs to
-be sent in the header of any request with all HTTP verbs besides `GET`. This
-header will be used to validate the `_csrf` cookie to confirm that the
-request comes from your site and not an unauthorized site.
+Then create in Middleware a file csrf.rs:
 
-Now that you set up all the pre-request middleware, it's time to set up the
-routes for your Axum application.
+```rust
+use axum::{
+    middleware::Next,
+    response::Response,
+    http::{Request, StatusCode, HeaderValue, Method},
+    body::Body,
+};
+
+/// CSRF middleware for protecting against Cross-Site Request Forgery attacks
+pub async fn csrf_middleware(
+    request: Request<Body>,
+    next: Next,
+) -> Result<Response, StatusCode> {
+    // Only verify CSRF token for unsafe methods
+    if is_unsafe_method(request.method()) {
+        // Check for CSRF token in headers
+        let token = request
+            .headers()
+            .get("X-CSRF-Token")
+            .and_then(|t| t.to_str().ok())
+            .ok_or(StatusCode::FORBIDDEN)?;
+
+        // In a real implementation, verify the token against a stored value
+        if token.is_empty() {
+            return Err(StatusCode::FORBIDDEN);
+        }
+    }
+
+    // Process the request
+    let mut response = next.run(request).await;
+
+    // Generate and add new CSRF token to response
+    let new_token = generate_token();
+    if let Ok(header_value) = HeaderValue::from_str(&new_token) {
+        response.headers_mut().insert("X-CSRF-Token", header_value);
+    }
+
+    Ok(response)
+}
+
+/// Helper function to check if a method is unsafe (requires CSRF protection)
+fn is_unsafe_method(method: &Method) -> bool {
+    matches!(
+        *method,
+        Method::POST | Method::PUT | Method::DELETE | Method::PATCH
+    )
+}
+
+/// Generate a new CSRF token
+fn generate_token() -> String {
+    use rand::{thread_rng, Rng};
+    const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ\
+                            abcdefghijklmnopqrstuvwxyz\
+                            0123456789";
+    const TOKEN_LEN: usize = 32;
+
+    let mut rng = thread_rng();
+
+    let token: String = (0..TOKEN_LEN)
+        .map(|_| {
+            let idx = rng.gen_range(0..CHARSET.len());
+            CHARSET[idx] as char
+        })
+        .collect();
+
+    token
+}
+```
+
+Update the Middleware mod.rs with the import/export:
+
+```rust
+pub mod csrf
+```
+
+Import the csrf in main.rs:
+
+```rust
+use middleware::csrf::csrf_middleware;
+```
+
+Add the csrf to the router before the security headers:
+
+```rust
+.layer(from_fn(csrf_middleware))
+```
+<br>
+
+
+
+## `JSON`
+
+In Axum, JSON handling is built-in through extractors.
+
+Add Json to the Axum import in main.rs:
+
+```rust
+use axum::{
+    extract::Json,
+    response::Json as JsonResponse,
+};
+```
+
+You will use the Json extractor directly in your route handlers.
+
+Here's an example how to handle JSON:
+
+```rust
+// Handler that receives JSON
+async fn create_user(
+    Json(payload): Json<User>
+) -> impl IntoResponse {
+    // payload is now a User struct
+    println!("Received user: {} {}", payload.name, payload.email);
+
+    // Return JSON response
+    Json(User {
+        name: payload.name,
+        email: payload.email,
+    })
+}
+
+// In your router setup:
+let app = Router::new()
+    .route("/users", post(create_user));
+
+// Shell
+curl -X POST -H "Content-Type: application/json" -d '{"name":"John","email":"john@example.com"}' http://localhost:5678/users
+
+```
+<br>
+
+
+
 
 ### Routes
 
-Create a folder called `routes` in your `backend` folder. All your routes will
+Create a folder called `routes` in your `src` folder. All your routes will
 live in this folder.
 
-Create an `index.js` file in the `routes` folder. In this file, create an
-Axum router, create a test route, and export the router at the bottom of the
+Create a `mod.rs` file in the `routes` folder for imports/exports.
+
+### users
+
+Create a users.rs file in the 'routes' folder.
+
+This will contain routes for users and the necessary handlers:
+
+```rust
+use axum::{
+    extract::State,
+    response::Json,
+    http::StatusCode,
+    routing::get,
+    Router,
+};
+use diesel::prelude::*;
+use std::sync::Arc;
+use crate::{
+    models::User,
+    schema::users,
+    AppState,
+};
+
+// Error response struct
+#[derive(serde::Serialize)]
+struct ErrorResponse {
+    message: String,
+}
+
+// Router setup function
+pub fn user_routes() -> Router<Arc<AppState>> {
+    Router::new()
+        .route("/users", get(get_users))
+}
+
+// Handler implementation
+pub async fn get_users(
+    State(state): State<Arc<AppState>>
+) -> Result<Json<Vec<User>>, (StatusCode, Json<ErrorResponse>)> {
+    // Get a connection from the pool (no await needed for r2d2)
+    let mut conn = state.db_pool.get()
+        .map_err(|e| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ErrorResponse {
+                    message: format!("Database connection error: {}", e)
+                })
+            )
+        })?;
+
+    // Execute the query (directly, no interact needed)
+    let users_result = users::table
+        .select(User::as_select())
+        .load(&mut *conn)
+        .map_err(|e| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ErrorResponse {
+                    message: format!("Database error: {}", e)
+                })
+            )
+        });
+
+    match users_result {
+        Ok(users) => Ok(Json(users)),
+        Err(e) => Err(e)
+    }
+}
+
+
+// You can add more handlers here:
+// async fn get_user() {...}
+// async fn create_user() {...}
+// async fn update_user() {...}
+// async fn delete_user() {...}
+```
+
+Update the mod.rs in Routes to handle the imports/exports:
+
+```rust
+mod users;
+pub use users::*;
+```
+
+Import the user routes and handlers to main.rs:
+
+```rust
+mod routes;
+use routes::{user_routes};
+```
+
+Finally, add the user routes to the router with a .merge as the first route:
+
+```rust
+.merge(user_routes())
+```
+
+
+<br>
+======================================================================================================================
+<br>
+
+### UNCHARTED
+
+In this file, create an Axum router, create a test route, and export the router at the bottom of the
 file.
 
 ```js
@@ -1302,6 +1478,14 @@ module.exports = app;
 ```
 
 After setting up the Axum application, it's time to create the server.
+
+
+
+
+
+
+
+
 
 ### `bin/www`
 

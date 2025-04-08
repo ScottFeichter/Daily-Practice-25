@@ -1,4 +1,3 @@
-// src/middleware/csrf.rs
 use axum::{
     middleware::Next,
     response::Response,

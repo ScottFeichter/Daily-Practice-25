@@ -3,7 +3,6 @@ use diesel::r2d2::{self, ConnectionManager, Pool};
 use dotenvy::dotenv;
 use std::sync::Arc;
 
-mod db;
 mod config;
 
 use config::Config;
@@ -12,8 +11,8 @@ use axum::{
     middleware::from_fn,
     routing::get,
     Router,
-    extract::{State},
-    response::{AppendHeaders, IntoResponse},
+    extract::{State, Json},
+    response::{AppendHeaders, IntoResponse, Json as JsonResponse},
     http::{Method, HeaderName, HeaderValue, header},
 };
 use std::net::SocketAddr;
@@ -22,12 +21,14 @@ use tower_http::cors::CorsLayer;
 
 use std::error::Error as StdError;
 
-
 mod middleware;
 use middleware::cors::create_cors_layer;
 use middleware::csrf::csrf_middleware;
 use middleware::cookies::{cookie_layer, protected_route};
+use middleware::security_headers::security_headers;
 
+mod routes;
+use routes::{user_routes};
 
 #[macro_use]
 extern crate diesel;
@@ -73,13 +74,15 @@ async fn main() -> Result<(), Box<dyn StdError>> {
 
     // Build our application with routes and add middleware
     let app: Router = Router::new()
+        .merge(user_routes())
         .route("/", get(root))
         .route("/health", get(health_check))
         .route("/protected", get(protected_route))
         .with_state(shared_state)
         .layer(cors)
         .layer(cookie_layer())
-        .layer(from_fn(csrf_middleware));
+        .layer(from_fn(csrf_middleware))
+        .layer(from_fn(security_headers));
 
     // Run the server
     let addr: SocketAddr = SocketAddr::from(([127, 0, 0, 1], 5678));

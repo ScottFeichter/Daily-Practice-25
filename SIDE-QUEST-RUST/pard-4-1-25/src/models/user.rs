@@ -2,7 +2,7 @@ use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 use crate::schema::users;
 
-#[derive(Queryable, Selectable, Deserialize, Serialize)]
+#[derive(Debug, Queryable, Selectable, Deserialize, Serialize)]
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct User {
