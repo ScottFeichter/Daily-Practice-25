@@ -1280,6 +1280,324 @@ Add the csrf to the router before the security headers:
 
 
 
+## `Test Routes JWT`
+
+We can make some test routes to check the set and get functions.
+
+In cookies.rs add the following:
+
+```rust
+// Test route to set JWT cookie
+pub async fn test_set_jwt(cookies: Cookies) -> impl IntoResponse {
+    // Create a sample JWT token - in production this would be properly generated
+    let test_token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+
+    // Set the JWT cookie
+    set_jwt_cookie(&cookies, test_token);
+
+    // Return a response we can see in the browser
+    Json(json!({
+        "message": "JWT cookie is set",
+        "status": "success",
+        "test_token": test_token
+    }))
+}
+
+
+
+// Test route to verify JWT cookie
+pub async fn test_get_jwt(cookies: Cookies) -> impl IntoResponse {
+    match get_jwt_cookie(&cookies) {
+        Some(token) => Json(json!({
+            "message": "JWT cookie found",
+            "token": token
+        })),
+        None => Json(json!({
+            "message": "No JWT cookie found",
+            "token": null
+        }))
+    }
+}
+```
+
+Notice that these handlers are passing cookies: Cookies argument.
+
+When this is passed in the handler it appears to trigger the set_jwt_token function.
+
+Now in main.rs add the imports for these handlers:
+
+```rust
+use middleware::cookies::{cookie_layer, protected_route, test_set_jwt, test_get_jwt};
+```
+
+Finally add the routes to the router after the root and health routes:
+
+```rust
+        .route("/", get(root))
+        .route("/health", get(health_check))
+        .route("/test/set-jwt", get(test_set_jwt))
+        .route("/test/get-jwt", get(test_get_jwt))
+```
+
+Now run the app and navigate to the endpoint /test/set-jwt then /test/get-jwt.
+
+You should get a success message with the false test jwt for both.
+<br>
+
+
+## `Seeders`
+
+Before we make routes we should make seeders to have data to test the routes.
+
+In src run the following commands:
+
+```shell
+mkdir db db/seeders
+touch db/mod.rs
+cd db/seeders
+touch mod.rs users.rs database.rs
+```
+
+The file structure should be:
+
+```text
+src/
+├── main.rs
+├── bin/
+│   └── seed.rs
+├── db/
+│   ├── mod.rs             # exports seeders module
+│   └── seeders/
+│       ├── mod.rs         # exports database and users modules
+│       ├── database.rs    # contains DatabaseSeeder struct
+│       └── users.rs       # contains seed_users function
+├── models/
+└── schema.rs
+
+```
+
+Add this to the db/mod.rs:
+
+```rust
+pub mod seeders;
+
+```
+
+Add this to the db/seeders/mod.rs:
+
+```rust
+mod users;
+mod database;
+
+pub use database::DatabaseSeeder;
+pub use users::*;
+```
+
+We will use bcrypt for hashing and salting so add it in cargo.toml:
+
+```toml
+[dependencies]
+bcrypt = "0.15"  # Or whatever the latest version is
+```
+
+Add this to the db/seeders/users.rs:
+
+```rust
+// src/db/seeders/users.rs
+use diesel::prelude::*;
+use crate::models::user::NewUser;
+use crate::schema::users;
+use bcrypt::{hash, DEFAULT_COST}; // You'll need the bcrypt crate for password hashing
+
+pub fn seed_users(conn: &mut PgConnection) -> QueryResult<()> {
+    // First clear the table to avoid duplicates
+    diesel::delete(users::table).execute(conn)?;
+
+    let users = vec![
+        NewUser {
+            name: "John Doe".to_string(),
+            username: "johndoe".to_string(),
+            email: "john@example.com".to_string(),
+            password_hash: hash("password123", DEFAULT_COST).unwrap(),
+        },
+        NewUser {
+            name: "Jane Smith".to_string(),
+            username: "janesmith".to_string(),
+            email: "jane@example.com".to_string(),
+            password_hash: hash("password123", DEFAULT_COST).unwrap(),
+        },
+    ];
+
+    diesel::insert_into(users::table)
+        .values(&users)
+        .execute(conn)?;
+
+    Ok(())
+}
+```
+
+Add this to the db/seeders/database.rs:
+
+```rust
+// src/db/seeders/database.rs
+use diesel::prelude::*;
+use super::users::seed_users;
+
+pub struct DatabaseSeeder {
+    conn: &'static mut PgConnection,
+}
+
+impl DatabaseSeeder {
+    pub fn new(conn: &'static mut PgConnection) -> Self {
+        DatabaseSeeder { conn }
+    }
+
+    pub fn run(&mut self) -> QueryResult<()> {
+        seed_users(&mut self.conn)?;
+        // Add more seed calls as needed
+        Ok(())
+    }
+}
+```
+
+Next we need a binary file to run the seeders.
+
+In src run the following commands:
+
+```shell
+mkdir bin
+cd bin
+touch bin/seed.rs
+```
+
+Add this to the bin/seed.rs:
+
+```rust
+// src/bin/seed.rs
+use diesel::prelude::*;
+use diesel::pg::PgConnection;
+use dotenv::dotenv;
+use std::env;
+// Update this path to match your project structure
+use your_project_name::db::seeders::DatabaseSeeder;
+
+fn main() {
+    dotenv().ok();
+    let database_url = env::var("DATABASE_URL")
+        .expect("DATABASE_URL must be set");
+
+    let mut conn = PgConnection::establish(&database_url)
+        .expect("Error connecting to database");
+
+    let conn_static = Box::leak(Box::new(conn));
+
+    let mut seeder = DatabaseSeeder::new(conn_static);
+
+    match seeder.run() {
+        Ok(_) => println!("Database seeded successfully!"),
+        Err(e) => eprintln!("Error seeding database: {}", e),
+    }
+}
+```
+
+Add information for the bin and seeders to cargo.toml:
+
+```toml
+[[bin]]
+name = "seed"
+path = "src/bin/seed.rs"
+```
+
+Add imports to include the necessary information in main.rs:
+
+```rust
+#[macro_use]
+extern crate diesel;
+pub mod models;
+pub mod schema;
+pub mod db;
+```
+
+Be sure the .env has the correct information set:
+
+```shell
+DATABASE_URL=postgres://username:password@localhost/database_name
+```
+
+Finally run the seeder in the shell:
+
+```shell
+cargo run --bin seed
+```
+
+You will experience issues because your project name has dashes instead of underscores.
+
+In which case you can use the seeder logic in main.rs instead of in a separate bin.
+
+Delete the bin directory and the [bin] information added to cargo.toml.
+
+Adjust main.rs with the following:
+
+```rust
+// src/main.rs
+#[macro_use]
+extern crate diesel;
+pub mod models;
+pub mod schema;
+pub mod db;
+
+pub fn seed_database() -> Result<(), Box<dyn std::error::Error>> {
+    use diesel::prelude::*;
+    use dotenv::dotenv;
+    use std::env;
+    use crate::db::seeders::DatabaseSeeder;
+
+    dotenv().ok();
+    let database_url = env::var("DATABASE_URL")
+        .expect("DATABASE_URL must be set");
+
+    let mut conn = PgConnection::establish(&database_url)
+        .expect("Error connecting to database");
+
+    let conn_static = Box::leak(Box::new(conn));
+
+    let mut seeder = DatabaseSeeder::new(conn_static);
+
+    match seeder.run() {
+        Ok(_) => println!("Database seeded successfully!"),
+        Err(e) => {
+            eprintln!("Error seeding database: {}", e);
+            return Err(Box::new(e));
+        }
+    }
+
+    Ok(())
+}
+
+fn main() {
+    // Your regular main application code here
+
+    // To run the seeder, you can either:
+    // 1. Call it directly:
+    // seed_database().unwrap();
+
+    // 2. Or use a command-line argument to determine when to seed:
+    if std::env::args().any(|arg| arg == "--seed") {
+        seed_database().unwrap();
+    }
+}
+```
+
+Now you can run the seeder by uncommenting the direct call in main or in the shell:
+
+```shell
+cargo run -- --seed
+```
+
+
+
+<br>
+
 ## `JSON`
 
 In Axum, JSON handling is built-in through extractors.

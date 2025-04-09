@@ -1,5 +1,8 @@
 use tower_cookies::{CookieManagerLayer, Cookies, Cookie};
-use axum::{response::IntoResponse, Json};
+use axum::{
+    response::{IntoResponse, Json},
+    routing::get,
+};
 use serde_json::json;
 
 /// Adds a signed cookie
@@ -37,4 +40,39 @@ pub async fn protected_route(cookies: Cookies) -> impl IntoResponse {
 /// Expose cookie middleware layer
 pub fn cookie_layer() -> CookieManagerLayer {
     CookieManagerLayer::new()
+}
+
+
+
+
+// Test route to set JWT cookie
+pub async fn test_set_jwt(cookies: Cookies) -> impl IntoResponse {
+    // Create a sample JWT token - in production this would be properly generated
+    let test_token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+
+    // Set the JWT cookie
+    set_jwt_cookie(&cookies, test_token);
+
+    // Return a response we can see in the browser
+    Json(json!({
+        "message": "JWT cookie is set",
+        "status": "success",
+        "test_token": test_token
+    }))
+}
+
+
+
+// Test route to verify JWT cookie
+pub async fn test_get_jwt(cookies: Cookies) -> impl IntoResponse {
+    match get_jwt_cookie(&cookies) {
+        Some(token) => Json(json!({
+            "message": "JWT cookie found",
+            "token": token
+        })),
+        None => Json(json!({
+            "message": "No JWT cookie found",
+            "token": null
+        }))
+    }
 }

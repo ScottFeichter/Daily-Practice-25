@@ -43,7 +43,7 @@ chrono = { version = "0.4", features = ["serde"] }
 rand = "0.8"
 tower-cookies = "0.11.0"
 
-
+bcrypt = "0.15"
 
 [dev-dependencies]
 cargo-watch = "8.5.3"                                                       # Equivalent to nodemon

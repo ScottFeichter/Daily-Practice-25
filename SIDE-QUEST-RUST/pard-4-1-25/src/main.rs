@@ -9,7 +9,7 @@ use config::Config;
 
 use axum::{
     middleware::from_fn,
-    routing::get,
+    routing::{get, post, put, patch, delete},
     Router,
     extract::{State, Json},
     response::{AppendHeaders, IntoResponse, Json as JsonResponse},
@@ -23,8 +23,8 @@ use std::error::Error as StdError;
 
 mod middleware;
 use middleware::cors::create_cors_layer;
-use middleware::csrf::csrf_middleware;
-use middleware::cookies::{cookie_layer, protected_route};
+use middleware::csrf::{csrf_middleware, test_csrf_get, test_csrf_post, debug_csrf};
+use middleware::cookies::{cookie_layer, protected_route, test_set_jwt, test_get_jwt};
 use middleware::security_headers::security_headers;
 
 mod routes;
@@ -34,6 +34,35 @@ use routes::{user_routes};
 extern crate diesel;
 pub mod models;
 pub mod schema;
+pub mod db;
+
+pub fn seed_database() -> Result<(), Box<dyn std::error::Error>> {
+    // use diesel::prelude::*;
+    // use dotenvy::dotenv;
+    use std::env;
+    use crate::db::seeders::DatabaseSeeder;
+
+    dotenv().ok();
+    let database_url = env::var("DATABASE_URL")
+        .expect("DATABASE_URL must be set");
+
+    let mut conn = PgConnection::establish(&database_url)
+        .expect("Error connecting to database");
+
+    let conn_static = Box::leak(Box::new(conn));
+
+    let mut seeder = DatabaseSeeder::new(conn_static);
+
+    match seeder.run() {
+        Ok(_) => println!("Database seeded successfully!"),
+        Err(e) => {
+            eprintln!("Error seeding database: {}", e);
+            return Err(Box::new(e));
+        }
+    }
+
+    Ok(())
+}
 
 // Define the application state
 pub struct AppState {
@@ -77,6 +106,11 @@ async fn main() -> Result<(), Box<dyn StdError>> {
         .merge(user_routes())
         .route("/", get(root))
         .route("/health", get(health_check))
+        .route("/test-csrf", get(test_csrf_get))
+        .route("/test-csrf-post", post(test_csrf_post))
+        .route("/test-csrf-debug", get(debug_csrf))
+        .route("/test/set-jwt", get(test_set_jwt))
+        .route("/test/get-jwt", get(test_get_jwt))
         .route("/protected", get(protected_route))
         .with_state(shared_state)
         .layer(cors)
@@ -92,6 +126,21 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     let listener: tokio::net::TcpListener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app.into_make_service())
         .await?;
+
+    // To run the seeder, you can either:
+    // 1. Call it directly:
+    // seed_database().unwrap();
+
+    // 2. Or use a command-line argument to determine when to seed:
+
+    if std::env::args().any(|arg| arg == "--seed") {
+        println!("Starting database seeding...");  // Add this for debugging
+        match seed_database() {
+            Ok(_) => println!("Seeding completed successfully"),
+            Err(e) => eprintln!("Seeding failed: {}", e),
+        }
+    }
+
 
     Ok(())
 }
