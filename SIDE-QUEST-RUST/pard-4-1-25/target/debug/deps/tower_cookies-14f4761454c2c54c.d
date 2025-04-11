@@ -1,0 +1,8 @@
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/pard-4-1-25/target/debug/deps/libtower_cookies-14f4761454c2c54c.rmeta: /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/extract.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/service/mod.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/service/future.rs
+
+/Users/scottfeichter/Dropbox/____DEV 2025/_Daily-Practice-25/SIDE-QUEST-RUST/pard-4-1-25/target/debug/deps/tower_cookies-14f4761454c2c54c.d: /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/lib.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/extract.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/service/mod.rs /Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/service/future.rs
+
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/lib.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/extract.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/service/mod.rs:
+/Users/scottfeichter/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tower-cookies-0.11.0/src/service/future.rs:

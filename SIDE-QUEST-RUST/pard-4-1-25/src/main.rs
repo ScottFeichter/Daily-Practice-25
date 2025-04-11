@@ -11,7 +11,7 @@ use axum::{
     middleware::from_fn,
     routing::{get, post, put, patch, delete},
     Router,
-    extract::{State, Json},
+    extract::{State, Json, Extension},
     response::{AppendHeaders, IntoResponse, Json as JsonResponse},
     http::{Method, HeaderName, HeaderValue, header},
 };
@@ -23,7 +23,7 @@ use std::error::Error as StdError;
 
 mod middleware;
 use middleware::cors::create_cors_layer;
-use middleware::csrf::{csrf_middleware, test_csrf_get, test_csrf_post, debug_csrf};
+use middleware::csrf::{csrf_middleware, test_csrf_get, test_csrf_post, debug_csrf, TokenStore};
 use middleware::cookies::{cookie_layer, protected_route, test_set_jwt, test_get_jwt};
 use middleware::security_headers::security_headers;
 
@@ -84,14 +84,14 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     let environment: String = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
     println!("environment: {:?}", environment);
 
-    // Create Cors layer
-    let cors: CorsLayer = create_cors_layer(&environment);
+
 
     // Set up connection pool
     let manager: ConnectionManager<PgConnection> = ConnectionManager::<PgConnection>::new(&config.database_url);
     let pool: Pool<ConnectionManager<PgConnection>> = Pool::builder()
         .build(manager)
         .expect("Failed to create pool");
+
 
     // Create shared state
     let shared_state: Arc<AppState> = Arc::new(AppState {
@@ -100,6 +100,15 @@ async fn main() -> Result<(), Box<dyn StdError>> {
 
     // Initialize tracing for logging
     tracing_subscriber::fmt::init();
+
+    // Create Cors layer
+    let cors: CorsLayer = create_cors_layer(&environment);
+
+    // Create token store
+    let token_store = Arc::new(TokenStore::new());
+    let token_store_layer = Extension(token_store);
+
+
 
     // Build our application with routes and add middleware
     let app: Router = Router::new()
@@ -113,10 +122,13 @@ async fn main() -> Result<(), Box<dyn StdError>> {
         .route("/test/get-jwt", get(test_get_jwt))
         .route("/protected", get(protected_route))
         .with_state(shared_state)
+        .layer(from_fn(csrf_middleware))
+        .layer(token_store_layer)  // Add TokenStore as an extension
         .layer(cors)
         .layer(cookie_layer())
-        .layer(from_fn(csrf_middleware))
         .layer(from_fn(security_headers));
+
+
 
     // Run the server
     let addr: SocketAddr = SocketAddr::from(([127, 0, 0, 1], 5678));
