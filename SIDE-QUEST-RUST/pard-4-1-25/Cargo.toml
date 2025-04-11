@@ -1,7 +1,7 @@
 [package]
 name = "pard-4-1-25"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
 pq-sys = "0.6.0"                                                            # Rust binding to the PostgreSQL library
@@ -29,6 +29,8 @@ tower-http = { version = "0.6.2", features = [                              # pr
     "set-status",                                                           # Middleware to override status codes.
     "trace",                                                                # Middleware for HTTP request/response logging
     "validate-request",                                                     # Middleware that validates requests.
+    "fs",
+    "add-extension",
 ] }
 
 

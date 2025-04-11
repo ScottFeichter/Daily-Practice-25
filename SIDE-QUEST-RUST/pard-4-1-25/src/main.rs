@@ -17,7 +17,16 @@ use axum::{
 };
 use std::net::SocketAddr;
 
+use tracing::{info, error};
+
+use tracing_subscriber;
 use tower_http::cors::CorsLayer;
+use tower_http::trace::TraceLayer;
+use tower_http::services::ServeDir;
+use tower_http::add_extension::AddExtensionLayer;
+use tower::ServiceBuilder;
+use axum::http::header::CONTENT_TYPE;
+// use tower_http::services::fs::ServeFileConfig;
 
 use std::error::Error as StdError;
 
@@ -102,7 +111,15 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     tracing_subscriber::fmt::init();
 
     // Create Cors layer
-    let cors: CorsLayer = create_cors_layer(&environment);
+    let cors = CorsLayer::new()
+    .allow_origin("*".parse::<HeaderValue>().unwrap())
+    .allow_methods([Method::GET, Method::POST])
+    .allow_headers([
+        CONTENT_TYPE,
+        HeaderName::from_static("x-csrf-token")
+    ])
+    .expose_headers([HeaderName::from_static("x-csrf-token")]);
+
 
     // Create token store
     let token_store = Arc::new(TokenStore::new());
@@ -113,10 +130,21 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     // Build our application with routes and add middleware
     let app: Router = Router::new()
         .merge(user_routes())
+        .nest_service("/static", ServeDir::new("static"))
         .route("/", get(root))
         .route("/health", get(health_check))
-        .route("/test-csrf", get(test_csrf_get))
+        .route("/test-csrf-get", get(test_csrf_get))
         .route("/test-csrf-post", post(test_csrf_post))
+        .layer(
+            ServiceBuilder::new()
+                .layer(TraceLayer::new_for_http())
+                .layer(
+                    CorsLayer::new()
+                        .allow_origin("*".parse::<HeaderValue>().unwrap())
+                        .allow_methods([Method::GET, Method::POST])
+                        .allow_headers([CONTENT_TYPE, HeaderName::from_static("x-csrf-token")])
+                )
+        )
         .route("/test-csrf-debug", get(debug_csrf))
         .route("/test/set-jwt", get(test_set_jwt))
         .route("/test/get-jwt", get(test_get_jwt))

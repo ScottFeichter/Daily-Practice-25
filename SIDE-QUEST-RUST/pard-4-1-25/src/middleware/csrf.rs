@@ -1,9 +1,9 @@
 use axum::{
     middleware::Next,
     response::{Response, IntoResponse, Html, Json},
-    http::{Request, StatusCode, HeaderValue, HeaderMap, Method},
+    http::{Request, StatusCode, HeaderValue, Method, HeaderName},
     body::Body,
-    extract::State,  // Added State import
+    extract::Extension,
 };
 use serde_json::json;
 use ring::rand::{SystemRandom, SecureRandom};
@@ -13,8 +13,6 @@ use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use axum::extract::Extension;
-
 
 /// Helper function to check if a method is unsafe (requires CSRF protection)
 fn is_unsafe_method(method: &Method) -> bool {
@@ -35,7 +33,7 @@ fn generate_secure_token() -> String {
 }
 
 // For making csrf tokens expirable
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 struct TokenData {
     token: String,
     expires_at: OffsetDateTime,
@@ -66,6 +64,13 @@ impl TokenStore {
         }
     }
 
+    pub async fn generate_token(&self) -> String {
+        let token_data = TokenData::new();
+        let token = token_data.token.clone();
+        self.store_token(token_data).await;
+        token
+    }
+
     pub async fn store_token(&self, token_data: TokenData) {
         let mut tokens = self.tokens.write().await;
         tokens.insert(token_data.token.clone(), token_data);
@@ -81,7 +86,6 @@ impl TokenStore {
             .unwrap_or(false)
     }
 
-    // Added cleanup method
     pub async fn cleanup_expired(&self) {
         let mut tokens = self.tokens.write().await;
         tokens.retain(|_, data| data.is_valid());
@@ -94,62 +98,51 @@ impl Default for TokenStore {
     }
 }
 
-// Security headers function
-fn add_security_headers(response: &mut Response) {
-    let headers = response.headers_mut();
-    headers.insert(
-        "Strict-Transport-Security",
-        HeaderValue::from_static("max-age=31536000; includeSubDomains"),
-    );
-    headers.insert(
-        "X-Frame-Options",
-        HeaderValue::from_static("SAMEORIGIN"),
-    );
-    headers.insert(
-        "X-Content-Type-Options",
-        HeaderValue::from_static("nosniff"),
-    );
-    headers.insert(
-        "X-XSS-Protection",
-        HeaderValue::from_static("1; mode=block"),
-    );
-}
-
 pub async fn csrf_middleware(
-    Extension(token_store): Extension<Arc<TokenStore>>,  // Changed to Extension
-    request: Request<Body>,
+    Extension(token_store): Extension<Arc<TokenStore>>,
+    mut request: Request<Body>,
     next: Next,
 ) -> Result<Response, StatusCode> {
-    if is_unsafe_method(request.method()) {
-        let token = request
-            .headers()
-            .get("X-CSRF-Token")
-            .and_then(|t| t.to_str().ok())
-            .ok_or(StatusCode::FORBIDDEN)?;
+    tracing::debug!("CSRF Middleware - Method: {:?}", request.method());
+    tracing::debug!("CSRF Middleware - Headers: {:?}", request.headers());
 
-        if !token_store.validate_token(token).await {
-            return Err(StatusCode::FORBIDDEN);
+    if is_unsafe_method(request.method()) {
+        match request.headers().get("x-csrf-token") {
+            Some(token) => {
+                if let Ok(token_str) = token.to_str() {
+                    tracing::debug!("Received CSRF token: {}", token_str);
+                    if !token_store.validate_token(token_str).await {
+                        tracing::error!("Invalid CSRF token");
+                        return Err(StatusCode::FORBIDDEN);
+                    }
+                    tracing::debug!("CSRF token validated successfully");
+                } else {
+                    tracing::error!("Invalid CSRF token format");
+                    return Err(StatusCode::FORBIDDEN);
+                }
+            }
+            None => {
+                tracing::error!("No CSRF token provided in headers");
+                return Err(StatusCode::FORBIDDEN);
+            }
         }
     }
 
-    let mut response = next.run(request).await;
+    let response = next.run(request).await;
 
-    // Generate and store new token
-    let token_data = TokenData::new();
-    let new_token = token_data.token.clone();
+    // Add new CSRF token to response
+    let mut response = response.into_response();
+    let new_token = token_store.generate_token().await;
 
-    token_store.store_token(token_data).await;
-
-    if let Ok(header_value) = HeaderValue::from_str(&new_token) {
-        response.headers_mut().insert("X-CSRF-Token", header_value);
+    if let Ok(token_value) = HeaderValue::from_str(&new_token) {
+        response.headers_mut().insert(
+            HeaderName::from_static("x-csrf-token"),
+            token_value
+        );
     }
-
-    // Add security headers
-    add_security_headers(&mut response);
 
     Ok(response)
 }
-
 
 // Test endpoints
 pub async fn test_csrf_get() -> impl IntoResponse {
@@ -165,52 +158,7 @@ pub async fn test_csrf_get() -> impl IntoResponse {
             <button id="showToken">Show CSRF Token</button>
             <button id="testPost">Test POST with CSRF</button>
 
-            <script>
-                // Function to update the CSRF token
-                function updateCSRFToken(token) {
-                    document.getElementById('csrf-token').content = token;
-                }
-
-                // Get initial CSRF token from headers
-                updateCSRFToken(document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
-
-                document.getElementById('showToken').addEventListener('click', async () => {
-                    const response = await fetch('/test-csrf-debug');
-                    const data = await response.json();
-                    // Update token from response header
-                    const newToken = response.headers.get('X-CSRF-Token');
-                    if (newToken) {
-                        updateCSRFToken(newToken);
-                    }
-                    document.getElementById('result').textContent =
-                        JSON.stringify(data, null, 2);
-                });
-
-                document.getElementById('testPost').addEventListener('click', async () => {
-                    const token = document.getElementById('csrf-token').content;
-                    try {
-                        const response = await fetch('/test-csrf-post', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-Token': token,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ test: 'data' })
-                        });
-                        const result = await response.json();
-                        // Update token from response header
-                        const newToken = response.headers.get('X-CSRF-Token');
-                        if (newToken) {
-                            updateCSRFToken(newToken);
-                        }
-                        document.getElementById('result').textContent =
-                            JSON.stringify(result, null, 2);
-                    } catch (err) {
-                        document.getElementById('result').textContent =
-                            'Error: ' + err.message;
-                    }
-                });
-            </script>
+            <script src="/static/js/csrf-test.js"></script>
         </body>
         </html>
     "#);
@@ -218,20 +166,48 @@ pub async fn test_csrf_get() -> impl IntoResponse {
     html
 }
 
-pub async fn test_csrf_post() -> impl IntoResponse {
-    Json(json!({ "message": "POST successful" }))
+pub async fn test_csrf_post(
+    Extension(token_store): Extension<Arc<TokenStore>>,
+    request: Request<Body>,
+) -> impl IntoResponse {
+    let headers = request.headers();
+
+    let csrf_token = headers
+        .get("x-csrf-token")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("No CSRF token found");
+
+    tracing::debug!("POST request received with token: {}", csrf_token);
+
+    let response = Json(json!({
+        "message": "POST successful",
+        "csrf_token_received": csrf_token,
+        "method": request.method().as_str(),
+        "headers": headers.iter()
+            .map(|(name, value)| (
+                name.as_str(),
+                value.to_str().unwrap_or("Invalid header value")
+            ))
+            .collect::<HashMap<_, _>>()
+    }));
+
+    (StatusCode::OK, response)
 }
 
 pub async fn debug_csrf(
     request: Request<Body>,
 ) -> impl IntoResponse {
     let headers = request.headers();
-    let csrf_header = headers.get("X-CSRF-Token")
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("No CSRF header");
 
     Json(json!({
-        "csrf_header": csrf_header,
+        "message": "CSRF token not required for GET requests",
         "method": request.method().as_str(),
+        "all_headers": headers.iter()
+            .map(|(name, value)| (
+                name.as_str(),
+                value.to_str().unwrap_or("Invalid header value")
+            ))
+            .collect::<HashMap<_, _>>(),
+        "note": "CSRF tokens are only required for POST, PUT, DELETE, and PATCH requests"
     }))
 }
