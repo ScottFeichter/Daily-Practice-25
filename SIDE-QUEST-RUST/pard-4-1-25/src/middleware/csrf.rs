@@ -14,6 +14,9 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
+
+
+
 /// Helper function to check if a method is unsafe (requires CSRF protection)
 fn is_unsafe_method(method: &Method) -> bool {
     matches!(
@@ -210,4 +213,18 @@ pub async fn debug_csrf(
             .collect::<HashMap<_, _>>(),
         "note": "CSRF tokens are only required for POST, PUT, DELETE, and PATCH requests"
     }))
+}
+
+
+
+
+
+
+pub async fn get_csrf_token(
+    Extension(token_store): Extension<Arc<TokenStore>>
+) -> impl IntoResponse {
+    let token = token_store.generate_token().await;
+    let mut map = HashMap::new();
+    map.insert("csrf_token".to_string(), token);
+    Json(map)
 }

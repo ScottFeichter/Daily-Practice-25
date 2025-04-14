@@ -4,7 +4,6 @@ use dotenvy::dotenv;
 use std::sync::Arc;
 
 mod config;
-
 use config::Config;
 
 use axum::{
@@ -23,7 +22,7 @@ use tracing_subscriber;
 use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
 use tower_http::services::ServeDir;
-use tower_http::add_extension::AddExtensionLayer;
+// use tower_http::add_extension::AddExtensionLayer;
 use tower::ServiceBuilder;
 use axum::http::header::CONTENT_TYPE;
 // use tower_http::services::fs::ServeFileConfig;
@@ -31,13 +30,15 @@ use axum::http::header::CONTENT_TYPE;
 use std::error::Error as StdError;
 
 mod middleware;
-use middleware::cors::create_cors_layer;
-use middleware::csrf::{csrf_middleware, test_csrf_get, test_csrf_post, debug_csrf, TokenStore};
+use middleware::cors::{create_cors_layer, Environment};
+use middleware::csrf::{csrf_middleware, test_csrf_get, test_csrf_post, debug_csrf, TokenStore, get_csrf_token};
 use middleware::cookies::{cookie_layer, protected_route, test_set_jwt, test_get_jwt};
 use middleware::security_headers::security_headers;
 
+
+
 mod routes;
-use routes::{user_routes};
+use routes::api::users::{user_routes, create_user_handler, update_user_handler};
 
 #[macro_use]
 extern crate diesel;
@@ -83,6 +84,8 @@ type AppStateShare = Arc<AppState>;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn StdError>> {
+
+
     // Load .env file
     dotenv().ok();
 
@@ -92,7 +95,6 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     // Get environment
     let environment: String = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
     println!("environment: {:?}", environment);
-
 
 
     // Set up connection pool
@@ -110,21 +112,10 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     // Initialize tracing for logging
     tracing_subscriber::fmt::init();
 
-    // Create Cors layer
-    let cors = CorsLayer::new()
-    .allow_origin("*".parse::<HeaderValue>().unwrap())
-    .allow_methods([Method::GET, Method::POST])
-    .allow_headers([
-        CONTENT_TYPE,
-        HeaderName::from_static("x-csrf-token")
-    ])
-    .expose_headers([HeaderName::from_static("x-csrf-token")]);
-
 
     // Create token store
     let token_store = Arc::new(TokenStore::new());
     let token_store_layer = Extension(token_store);
-
 
 
     // Build our application with routes and add middleware
@@ -135,26 +126,20 @@ async fn main() -> Result<(), Box<dyn StdError>> {
         .route("/health", get(health_check))
         .route("/test-csrf-get", get(test_csrf_get))
         .route("/test-csrf-post", post(test_csrf_post))
-        .layer(
-            ServiceBuilder::new()
-                .layer(TraceLayer::new_for_http())
-                .layer(
-                    CorsLayer::new()
-                        .allow_origin("*".parse::<HeaderValue>().unwrap())
-                        .allow_methods([Method::GET, Method::POST])
-                        .allow_headers([CONTENT_TYPE, HeaderName::from_static("x-csrf-token")])
-                )
-        )
         .route("/test-csrf-debug", get(debug_csrf))
         .route("/test/set-jwt", get(test_set_jwt))
         .route("/test/get-jwt", get(test_get_jwt))
         .route("/protected", get(protected_route))
+        .route("/users", post(create_user_handler))
+        .route("/users/{id}", patch(update_user_handler))
+        .route("/csrf-token", get(get_csrf_token))
         .with_state(shared_state)
         .layer(from_fn(csrf_middleware))
         .layer(token_store_layer)  // Add TokenStore as an extension
-        .layer(cors)
+        .layer(create_cors_layer(Environment::Development))
         .layer(cookie_layer())
-        .layer(from_fn(security_headers));
+        .layer(from_fn(security_headers))
+        .layer(TraceLayer::new_for_http());
 
 
 

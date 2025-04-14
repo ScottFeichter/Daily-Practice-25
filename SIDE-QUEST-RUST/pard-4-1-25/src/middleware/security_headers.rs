@@ -15,8 +15,13 @@ pub async fn security_headers(
     // Content Security Policy
     headers.insert(
         header::CONTENT_SECURITY_POLICY,
-        HeaderValue::from_static("default-src 'self'; script-src 'self'")
+        HeaderValue::from_static(
+            "default-src 'self'; \
+             connect-src 'self' http://localhost:5678; \
+             script-src 'self' 'unsafe-inline' 'unsafe-eval';"
+        ),
     );
+
 
     // XSS Protection
     headers.insert(
