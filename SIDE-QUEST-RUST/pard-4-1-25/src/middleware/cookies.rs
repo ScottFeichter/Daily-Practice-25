@@ -1,8 +1,5 @@
 use tower_cookies::{CookieManagerLayer, Cookies, Cookie};
-use axum::{
-    response::{IntoResponse, Json},
-    routing::get,
-};
+use axum::response::{IntoResponse, Json};
 use serde_json::json;
 
 /// Adds a signed cookie

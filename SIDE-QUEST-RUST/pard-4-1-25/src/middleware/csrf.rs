@@ -103,17 +103,17 @@ impl Default for TokenStore {
 
 pub async fn csrf_middleware(
     Extension(token_store): Extension<Arc<TokenStore>>,
-    mut request: Request<Body>,
+    request: Request<Body>,
     next: Next,
 ) -> Result<Response, StatusCode> {
-    tracing::debug!("CSRF Middleware - Method: {:?}", request.method());
-    tracing::debug!("CSRF Middleware - Headers: {:?}", request.headers());
+    // tracing::debug!("CSRF Middleware - Method: {:?}", request.method());
+    // tracing::debug!("CSRF Middleware - Headers: {:?}", request.headers());
 
     if is_unsafe_method(request.method()) {
         match request.headers().get("x-csrf-token") {
             Some(token) => {
                 if let Ok(token_str) = token.to_str() {
-                    tracing::debug!("Received CSRF token: {}", token_str);
+                    // tracing::debug!("Received CSRF token: {}", token_str);
                     if !token_store.validate_token(token_str).await {
                         tracing::error!("Invalid CSRF token");
                         return Err(StatusCode::FORBIDDEN);

@@ -1,86 +1,41 @@
-use diesel::prelude::*;
-use diesel::r2d2::{self, ConnectionManager, Pool};
-use dotenvy::dotenv;
-use std::sync::Arc;
-
 mod config;
-use config::Config;
-
-use axum::{
-    middleware::from_fn,
-    routing::{get, post, put, patch, delete},
-    Router,
-    extract::{State, Json, Extension},
-    response::{AppendHeaders, IntoResponse, Json as JsonResponse},
-    http::{Method, HeaderName, HeaderValue, header},
-};
-use std::net::SocketAddr;
-
-use tracing::{info, error};
-
-use tracing_subscriber;
-use tower_http::cors::CorsLayer;
-use tower_http::trace::TraceLayer;
-use tower_http::services::ServeDir;
-// use tower_http::add_extension::AddExtensionLayer;
-use tower::ServiceBuilder;
-use axum::http::header::CONTENT_TYPE;
-// use tower_http::services::fs::ServeFileConfig;
-
-use std::error::Error as StdError;
-
 mod middleware;
-use middleware::cors::{create_cors_layer, Environment};
-use middleware::csrf::{csrf_middleware, test_csrf_get, test_csrf_post, debug_csrf, TokenStore, get_csrf_token};
-use middleware::cookies::{cookie_layer, protected_route, test_set_jwt, test_get_jwt};
-use middleware::security_headers::security_headers;
-
-
-
 mod routes;
-use routes::api::users::{user_routes, create_user_handler, update_user_handler};
-
-#[macro_use]
-extern crate diesel;
+mod errors;
 pub mod models;
 pub mod schema;
 pub mod db;
 
-pub fn seed_database() -> Result<(), Box<dyn std::error::Error>> {
-    // use diesel::prelude::*;
-    // use dotenvy::dotenv;
-    use std::env;
-    use crate::db::seeders::DatabaseSeeder;
+use std::{sync::Arc, error::Error as StdError, net::SocketAddr};
+use dotenvy::dotenv;
+use diesel::{prelude::*, r2d2::{ConnectionManager, Pool}};
+use axum::{
+    middleware::from_fn,
+    routing::{get, post},
+    Router,
+    extract::Extension,
+};
+use tower_http::{trace::TraceLayer, services::ServeDir};
+use tracing_subscriber;
+use config::Config;
+use middleware::{
+    cors::{create_cors_layer, Environment},
+    csrf::{csrf_middleware, test_csrf_get, test_csrf_post, debug_csrf, TokenStore, get_csrf_token},
+    cookies::{cookie_layer, protected_route, test_set_jwt, test_get_jwt},
+    security_headers::security_headers
+ };
+use routes::{
+    api::users::user_routes,
+    general::general_routes,
+};
 
-    dotenv().ok();
-    let database_url = env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
 
-    let mut conn = PgConnection::establish(&database_url)
-        .expect("Error connecting to database");
-
-    let conn_static = Box::leak(Box::new(conn));
-
-    let mut seeder = DatabaseSeeder::new(conn_static);
-
-    match seeder.run() {
-        Ok(_) => println!("Database seeded successfully!"),
-        Err(e) => {
-            eprintln!("Error seeding database: {}", e);
-            return Err(Box::new(e));
-        }
-    }
-
-    Ok(())
-}
 
 // Define the application state
 pub struct AppState {
     pub db_pool: Pool<ConnectionManager<PgConnection>>,
 }
 
-// Type alias for shared state
-type AppStateShare = Arc<AppState>;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn StdError>> {
@@ -94,8 +49,7 @@ async fn main() -> Result<(), Box<dyn StdError>> {
 
     // Get environment
     let environment: String = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
-    println!("environment: {:?}", environment);
-
+    tracing::info!("environment: {}", environment);
 
     // Set up connection pool
     let manager: ConnectionManager<PgConnection> = ConnectionManager::<PgConnection>::new(&config.database_url);
@@ -112,26 +66,21 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     // Initialize tracing for logging
     tracing_subscriber::fmt::init();
 
-
     // Create token store
     let token_store = Arc::new(TokenStore::new());
     let token_store_layer = Extension(token_store);
 
-
     // Build our application with routes and add middleware
     let app: Router = Router::new()
         .merge(user_routes())
+        .merge(general_routes())
         .nest_service("/static", ServeDir::new("static"))
-        .route("/", get(root))
-        .route("/health", get(health_check))
         .route("/test-csrf-get", get(test_csrf_get))
         .route("/test-csrf-post", post(test_csrf_post))
         .route("/test-csrf-debug", get(debug_csrf))
         .route("/test/set-jwt", get(test_set_jwt))
         .route("/test/get-jwt", get(test_get_jwt))
         .route("/protected", get(protected_route))
-        .route("/users", post(create_user_handler))
-        .route("/users/{id}", patch(update_user_handler))
         .route("/csrf-token", get(get_csrf_token))
         .with_state(shared_state)
         .layer(from_fn(csrf_middleware))
@@ -141,41 +90,16 @@ async fn main() -> Result<(), Box<dyn StdError>> {
         .layer(from_fn(security_headers))
         .layer(TraceLayer::new_for_http());
 
-
-
     // Run the server
     let addr: SocketAddr = SocketAddr::from(([127, 0, 0, 1], 5678));
-    println!("Server running on http://{}", addr);
+    tracing::info!("Server running on http://{}", addr);
+
 
     // Create the listener
     let listener: tokio::net::TcpListener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app.into_make_service())
         .await?;
 
-    // To run the seeder, you can either:
-    // 1. Call it directly:
-    // seed_database().unwrap();
-
-    // 2. Or use a command-line argument to determine when to seed:
-
-    if std::env::args().any(|arg| arg == "--seed") {
-        println!("Starting database seeding...");  // Add this for debugging
-        match seed_database() {
-            Ok(_) => println!("Seeding completed successfully"),
-            Err(e) => eprintln!("Seeding failed: {}", e),
-        }
-    }
-
 
     Ok(())
-}
-
-// Example of a handler using state
-async fn root(_state: State<AppStateShare>) -> &'static str {
-    "Hello, World!"
-}
-
-// Health check endpoint
-async fn health_check() -> &'static str {
-    "OK"
 }

@@ -1,0 +1,1 @@
+for<'a> fn(&'a mut diesel::PgConnection, i32) -> impl Future<Output = Result<(), diesel::result::Error>> {delete_user}
