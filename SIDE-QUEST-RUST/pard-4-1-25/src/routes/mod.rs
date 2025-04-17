@@ -1,6 +1,5 @@
 pub mod api;
-pub mod auth;
+pub mod authentication_handlers;
+pub mod authentication_router;
 pub mod health;
 pub mod general;
-
-

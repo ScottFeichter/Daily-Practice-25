@@ -1,1 +1,0 @@
-fn(Extension<Arc<TokenStore>>, axum::http::Request<Body>, Next) -> impl Future<Output = Result<Response<Body>, axum::http::StatusCode>> {csrf_middleware}

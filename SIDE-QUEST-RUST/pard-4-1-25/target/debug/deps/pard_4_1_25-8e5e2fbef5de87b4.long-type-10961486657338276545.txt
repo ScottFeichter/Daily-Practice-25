@@ -1,1 +1,0 @@
-fn(axum::extract::State<Arc<AppState>>, {type error}, axum::Json<UpdateUserRequest>) -> impl Future<Output = Result<axum::Json<user::User>, (axum::http::StatusCode, axum::Json<api::users::ErrorResponse>)>> {update_user_handler}

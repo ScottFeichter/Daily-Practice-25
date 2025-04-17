@@ -1,5 +1,6 @@
 mod config;
 mod middleware;
+mod services;
 mod routes;
 mod errors;
 pub mod models;
@@ -21,12 +22,13 @@ use config::Config;
 use middleware::{
     cors::{create_cors_layer, Environment},
     csrf::{csrf_middleware, test_csrf_get, test_csrf_post, debug_csrf, TokenStore, get_csrf_token},
-    cookies::{cookie_layer, protected_route, test_set_jwt, test_get_jwt},
+    cookies::cookie_layer,
     security_headers::security_headers
  };
 use routes::{
     api::users::user_routes,
     general::general_routes,
+    authentication_router::authentication_routes,
 };
 
 
@@ -74,13 +76,11 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     let app: Router = Router::new()
         .merge(user_routes())
         .merge(general_routes())
+        .nest("/auth", authentication_routes()) 
         .nest_service("/static", ServeDir::new("static"))
         .route("/test-csrf-get", get(test_csrf_get))
         .route("/test-csrf-post", post(test_csrf_post))
         .route("/test-csrf-debug", get(debug_csrf))
-        .route("/test/set-jwt", get(test_set_jwt))
-        .route("/test/get-jwt", get(test_get_jwt))
-        .route("/protected", get(protected_route))
         .route("/csrf-token", get(get_csrf_token))
         .with_state(shared_state)
         .layer(from_fn(csrf_middleware))
@@ -89,6 +89,7 @@ async fn main() -> Result<(), Box<dyn StdError>> {
         .layer(cookie_layer())
         .layer(from_fn(security_headers))
         .layer(TraceLayer::new_for_http());
+
 
     // Run the server
     let addr: SocketAddr = SocketAddr::from(([127, 0, 0, 1], 5678));
