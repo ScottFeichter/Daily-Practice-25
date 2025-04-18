@@ -1,69 +1,77 @@
-use axum_macros::debug_handler;
 use axum::{
     extract::State,
-    response::{IntoResponse, Response},
+    response::IntoResponse,
     Json,
     http::StatusCode,
-    body::Body,
+    Extension,
 };
 use tower_cookies::Cookies;
-use serde::Deserialize;
 use std::sync::Arc;
 use serde_json::json;
 
 use crate::{
     services::authentication_service::AuthenticationService,
-    middleware::cookies::{
-        set_access_token,
-        set_refresh_token,
-        get_refresh_token,
-        remove_auth_cookies
-    },
+    services::database::Database,
+    models::user::{User, LoginRequest},
+    middleware::cookies::{set_access_token, set_refresh_token},
+    config::Config,
 };
 
-#[derive(Deserialize)]
-pub struct LoginRequest {
-    username: String,
-    password: String,
-}
-
-#[debug_handler] // Add this attribute to help with debugging
 pub async fn login_handler(
-    State(auth_service): State<Arc<AuthenticationService>>,
+    State(authentication_service): State<Arc<AuthenticationService>>,
+    State(db): State<Arc<Database>>,
     cookies: Cookies,
+    config: Extension<Config>,
     Json(credentials): Json<LoginRequest>,
 ) -> impl IntoResponse {
-    let user_id = "user123".to_string();
+    match db.validate_user_credentials(&credentials.username, &credentials.password).await {
+        Ok(user) => {
+            // Convert i32 to string for token generation
+            let user_id = user.id.to_string();
+            match authentication_service.generate_access_token(&user_id) {
+                Ok(access_token) => {
+                    match authentication_service.generate_refresh_token(&user_id) {
+                        Ok(refresh_token) => {
+                            set_access_token(&cookies, access_token, &config);
+                            set_refresh_token(&cookies, refresh_token, &config);
 
-    match auth_service.generate_access_token(&user_id) {
-        Ok(access_token) => {
-            match auth_service.generate_refresh_token(&user_id) {
-                Ok(refresh_token) => {
-                    set_access_token(&cookies, access_token);
-                    set_refresh_token(&cookies, refresh_token);
-
-                    (
-                        StatusCode::OK,
-                        Json(json!({
-                            "status": "success",
-                            "message": "Successfully logged in"
-                        }))
-                    )
+                            (
+                                StatusCode::OK,
+                                Json(json!({
+                                    "status": "success",
+                                    "message": "Successfully logged in",
+                                    "user": {
+                                        "id": user.id,
+                                        "username": user.username,
+                                        "name": user.name,
+                                        "email": user.email
+                                    }
+                                }))
+                            )
+                        },
+                        Err(_) => (
+                            StatusCode::INTERNAL_SERVER_ERROR,
+                            Json(json!({
+                                "status": "error",
+                                "message": "Failed to generate refresh token"
+                            }))
+                        )
+                    }
                 },
                 Err(_) => (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     Json(json!({
                         "status": "error",
-                        "message": "Failed to generate refresh token"
+                        "message": "Failed to generate access token"
                     }))
                 )
             }
         },
         Err(_) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
+            StatusCode::UNAUTHORIZED,
             Json(json!({
                 "status": "error",
-                "message": "Failed to generate access token"
+                "message": "Invalid username or password"
             }))
         )
     }
@@ -71,16 +79,17 @@ pub async fn login_handler(
 
 #[debug_handler]
 pub async fn refresh_token_handler(
-    State(auth_service): State<Arc<AuthenticationService>>,
+    State(authentication_service): State<Arc<AuthenticationService>>,
     cookies: Cookies,
+    config: Extension<Config>,
 ) -> impl IntoResponse {
     match get_refresh_token(&cookies) {
         Some(refresh_token) => {
-            match auth_service.verify_refresh_token(&refresh_token) {
+            match authentication_service.verify_refresh_token(&refresh_token) {
                 Ok(claims) => {
-                    match auth_service.generate_access_token(&claims.sub) {
+                    match authentication_service.generate_access_token(&claims.sub) {
                         Ok(new_access_token) => {
-                            set_access_token(&cookies, new_access_token);
+                            set_access_token(&cookies, new_access_token, &config);
                             (
                                 StatusCode::OK,
                                 Json(json!({

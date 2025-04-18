@@ -1,5 +1,5 @@
 // importing the models
-mod user;
+pub mod user;
 mod post;
 mod api;
 

@@ -1,0 +1,41 @@
+
+
+JWT Implementation
+
+src/
+├── middleware/
+│   ├── cookies.rs                          // Step 1: Cookie handling functions
+│   └── authentication_middleware.rs        // Step 4: Auth middleware
+├── services/
+│   └── authentication_service.rs           // Step 2: AuthService implementation
+├── routes/
+│   └── authentication_hanlders.rs          // Step 3: Authentication handlers
+└── main.rs                                 // Router setup and app configuration
+
+Component Organization
+
+// All cookie-related functions from Step 1:
+// - TokenCookieOptions struct and implementation
+// - set_token_cookie
+// - set_access_token
+// - set_refresh_token
+// - get_access_token
+// - get_refresh_token
+// - remove_auth_cookies
+
+
+// All JWT-related logic from Step 2:
+// - TokenClaims struct
+// - AuthService struct and implementation
+// - Token generation and verification methods
+
+
+// All route handlers from Step 3:
+// - LoginRequest struct
+// - login_handler
+// - refresh_token_handler
+// - logout_handler
+
+
+// Authentication middleware from Step 4:
+// - auth_middleware function

@@ -2,6 +2,7 @@ use jsonwebtoken::{encode, decode, Header, EncodingKey, DecodingKey, Validation,
 use serde::{Deserialize, Serialize};
 use time::{OffsetDateTime, Duration};
 use uuid::Uuid;
+use crate::config::Config;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenClaims {
@@ -17,12 +18,10 @@ pub struct AuthenticationService {
 }
 
 impl AuthenticationService {
-    pub fn new() -> Self {
+    pub fn new(config: &Config) -> Self {
         Self {
-            access_secret: std::env::var("JWT_ACCESS_SECRET")
-                .expect("JWT_ACCESS_SECRET must be set"),
-            refresh_secret: std::env::var("JWT_REFRESH_SECRET")
-                .expect("JWT_REFRESH_SECRET must be set"),
+            access_secret: config.jwt_access_secret.clone(),
+            refresh_secret: config.jwt_refresh_secret.clone(),
         }
     }
 

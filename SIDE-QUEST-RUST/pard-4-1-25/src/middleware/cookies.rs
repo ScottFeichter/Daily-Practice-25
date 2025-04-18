@@ -3,9 +3,13 @@ use axum::response::{IntoResponse, Json};
 use serde_json::json;
 use time::Duration;
 use cookie::SameSite;
+use crate::config::Config;
 
 const ACCESS_COOKIE_NAME: &'static str = "access_token";
 const REFRESH_COOKIE_NAME: &'static str = "refresh_token";
+
+const DEFAULT_ACCESS_TOKEN_EXPIRES: i64 = 900; // 15 minutes in seconds
+const DEFAULT_REFRESH_TOKEN_EXPIRES: i64 = 604800; // 7 days in seconds
 
 /// Expose cookie middleware layer
 pub fn cookie_layer() -> CookieManagerLayer {
@@ -20,7 +24,7 @@ pub struct TokenCookieOptions {
     pub max_age: Option<Duration>,
 }
 
-impl Default for TokenCookieOptions {
+impl Default for TokenCookieOptions {                               // Default is a built in Rust trait
     fn default() -> Self {
         Self {
             http_only: true,
@@ -44,30 +48,43 @@ pub fn set_token_cookie(
     cookie.set_same_site(options.same_site);
     cookie.set_path(options.path);
 
-    if let Some(max_age) = options.max_age {
+    if let Some(max_age) = options.max_age {            // Some is part of the Option enum
         cookie.set_max_age(max_age);
     }
 
     cookies.add(cookie);
 }
 
-pub fn set_access_token(cookies: &Cookies, token: String) {
+pub fn set_access_token(cookies: &Cookies, token: String, config: &Config) {
+    let expires_in = if config.jwt_access_expires_in <= 0 {
+        DEFAULT_ACCESS_TOKEN_EXPIRES
+    } else {
+        config.jwt_access_expires_in
+    };
+
     let options = TokenCookieOptions {
         path: "/api".to_string(),
-        max_age: Some(Duration::minutes(15)),
+        max_age: Some(Duration::seconds(expires_in)),
         ..Default::default()
     };
     set_token_cookie(cookies, ACCESS_COOKIE_NAME.to_string(), token, options);
 }
 
-pub fn set_refresh_token(cookies: &Cookies, token: String) {
+pub fn set_refresh_token(cookies: &Cookies, token: String, config: &Config) {
+    let expires_in = if config.jwt_refresh_expires_in <= 0 {
+        DEFAULT_REFRESH_TOKEN_EXPIRES
+    } else {
+        config.jwt_refresh_expires_in
+    };
+
     let options = TokenCookieOptions {
         path: "/api/auth/refresh".to_string(),
-        max_age: Some(Duration::days(7)),
+        max_age: Some(Duration::seconds(expires_in)),
         ..Default::default()
     };
     set_token_cookie(cookies, REFRESH_COOKIE_NAME.to_string(), token, options);
 }
+
 
 pub fn get_access_token(cookies: &Cookies) -> Option<String> {
     cookies.get(ACCESS_COOKIE_NAME).map(|c| c.value().to_string())

@@ -32,3 +32,9 @@ pub struct UpdateUser {
     pub email: Option<String>,
     pub password_hash: Option<String>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct LoginRequest {
+    pub username: String,
+    pub password: String,
+}

@@ -76,7 +76,7 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     let app: Router = Router::new()
         .merge(user_routes())
         .merge(general_routes())
-        .nest("/auth", authentication_routes()) 
+        .nest("/auth", authentication_routes(&config))
         .nest_service("/static", ServeDir::new("static"))
         .route("/test-csrf-get", get(test_csrf_get))
         .route("/test-csrf-post", post(test_csrf_post))

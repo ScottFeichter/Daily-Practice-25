@@ -1,0 +1,1 @@
+fn(axum::extract::State<Arc<AuthenticationService>>, Cookies, Extension<config::config::Config>, axum::Json<LoginRequest>) -> impl std::future::Future<Output = impl IntoResponse> {authentication_handlers::login_handler}
