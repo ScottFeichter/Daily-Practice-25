@@ -7,6 +7,7 @@ use axum::{
 };
 use std::sync::Arc;
 use serde_json::json;
+use diesel::PgConnection;
 
 use crate::{
     services::authentication_service::AuthenticationService,
@@ -19,8 +20,11 @@ use crate::{
     config::Config,
 };
 
-pub fn authentication_routes(config: &Config) -> Router<Arc<AppState>> {
-    let authentication_service = Arc::new(AuthenticationService::new(config));
+pub fn authentication_routes(
+    config: &Config,
+    pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<PgConnection>>
+) -> Router<Arc<AppState>> {
+    let authentication_service = Arc::new(AuthenticationService::new(config, pool));
 
     // Create protected routes
     let protected_routes = Router::new()

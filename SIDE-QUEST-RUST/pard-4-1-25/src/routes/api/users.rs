@@ -216,7 +216,6 @@ pub async fn update_user_handler(
 
 
 // DELETE USER
-
 pub async fn delete_user_handler(
     State(state): State<Arc<AppState>>,
     Path(user_id): Path<i32>,

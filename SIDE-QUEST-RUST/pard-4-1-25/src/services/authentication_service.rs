@@ -2,7 +2,13 @@ use jsonwebtoken::{encode, decode, Header, EncodingKey, DecodingKey, Validation,
 use serde::{Deserialize, Serialize};
 use time::{OffsetDateTime, Duration};
 use uuid::Uuid;
-use crate::config::Config;
+use diesel::prelude::*;
+use bcrypt::verify;
+use diesel::PgConnection;
+use crate::{
+    config::Config,
+    models::user::User,
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenClaims {
@@ -12,16 +18,53 @@ pub struct TokenClaims {
     pub jti: String,
 }
 
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("Invalid credentials")]
+    InvalidCredentials,
+
+    #[error("Database error: {0}")]
+    Database(#[from] diesel::result::Error),
+
+    #[error("Password hash error: {0}")]
+    BcryptError(#[from] bcrypt::BcryptError),
+
+    #[error("Connection pool error: {0}")]
+    PoolError(#[from] diesel::r2d2::PoolError),
+
+    #[error("Token error: {0}")]
+    Token(#[from] jsonwebtoken::errors::Error),
+}
+
 pub struct AuthenticationService {
     access_secret: String,
     refresh_secret: String,
+    pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<PgConnection>>,
 }
 
 impl AuthenticationService {
-    pub fn new(config: &Config) -> Self {
+    pub fn new(config: &Config, pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<PgConnection>>) -> Self {
         Self {
             access_secret: config.jwt_access_secret.clone(),
             refresh_secret: config.jwt_refresh_secret.clone(),
+            pool,
+        }
+    }
+
+    pub async fn validate_credentials(&self, username_param: &str, password: &str) -> Result<User, Error> {
+        use crate::schema::users::dsl::*;
+
+        let mut conn = self.pool.get()?;
+
+        let user = users
+            .filter(username.eq(username_param))
+            .first::<User>(&mut conn)
+            .map_err(|_| Error::InvalidCredentials)?;
+
+        if verify(password, &user.password_hash)? {
+            Ok(user)
+        } else {
+            Err(Error::InvalidCredentials)
         }
     }
 

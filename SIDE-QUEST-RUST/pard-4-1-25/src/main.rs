@@ -24,25 +24,20 @@ use middleware::{
     csrf::{csrf_middleware, test_csrf_get, test_csrf_post, debug_csrf, TokenStore, get_csrf_token},
     cookies::cookie_layer,
     security_headers::security_headers
- };
+};
 use routes::{
     api::users::user_routes,
     general::general_routes,
     authentication_router::authentication_routes,
 };
 
-
-
 // Define the application state
 pub struct AppState {
     pub db_pool: Pool<ConnectionManager<PgConnection>>,
 }
 
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn StdError>> {
-
-
     // Load .env file
     dotenv().ok();
 
@@ -59,6 +54,8 @@ async fn main() -> Result<(), Box<dyn StdError>> {
         .build(manager)
         .expect("Failed to create pool");
 
+    // Clone pool for authentication service
+    let authentication_pool = pool.clone();
 
     // Create shared state
     let shared_state: Arc<AppState> = Arc::new(AppState {
@@ -76,7 +73,7 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     let app: Router = Router::new()
         .merge(user_routes())
         .merge(general_routes())
-        .nest("/auth", authentication_routes(&config))
+        .nest("/auth", authentication_routes(&config, authentication_pool))
         .nest_service("/static", ServeDir::new("static"))
         .route("/test-csrf-get", get(test_csrf_get))
         .route("/test-csrf-post", post(test_csrf_post))
@@ -90,17 +87,14 @@ async fn main() -> Result<(), Box<dyn StdError>> {
         .layer(from_fn(security_headers))
         .layer(TraceLayer::new_for_http());
 
-
     // Run the server
     let addr: SocketAddr = SocketAddr::from(([127, 0, 0, 1], 5678));
     tracing::info!("Server running on http://{}", addr);
-
 
     // Create the listener
     let listener: tokio::net::TcpListener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app.into_make_service())
         .await?;
-
 
     Ok(())
 }

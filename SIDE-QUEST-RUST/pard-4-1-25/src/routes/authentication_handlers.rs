@@ -11,22 +11,24 @@ use serde_json::json;
 
 use crate::{
     services::authentication_service::AuthenticationService,
-    services::database::Database,
-    models::user::{User, LoginRequest},
-    middleware::cookies::{set_access_token, set_refresh_token},
+    models::user::LoginRequest,
+    middleware::cookies::{
+        set_access_token,
+        set_refresh_token,
+        get_refresh_token,
+        remove_auth_cookies
+    },
     config::Config,
 };
 
 pub async fn login_handler(
     State(authentication_service): State<Arc<AuthenticationService>>,
-    State(db): State<Arc<Database>>,
     cookies: Cookies,
     config: Extension<Config>,
     Json(credentials): Json<LoginRequest>,
 ) -> impl IntoResponse {
-    match db.validate_user_credentials(&credentials.username, &credentials.password).await {
+    match authentication_service.validate_credentials(&credentials.username, &credentials.password).await {
         Ok(user) => {
-            // Convert i32 to string for token generation
             let user_id = user.id.to_string();
             match authentication_service.generate_access_token(&user_id) {
                 Ok(access_token) => {
@@ -77,7 +79,6 @@ pub async fn login_handler(
     }
 }
 
-#[debug_handler]
 pub async fn refresh_token_handler(
     State(authentication_service): State<Arc<AuthenticationService>>,
     cookies: Cookies,
@@ -87,16 +88,31 @@ pub async fn refresh_token_handler(
         Some(refresh_token) => {
             match authentication_service.verify_refresh_token(&refresh_token) {
                 Ok(claims) => {
+                    // Generate new access token and refresh token
                     match authentication_service.generate_access_token(&claims.sub) {
                         Ok(new_access_token) => {
-                            set_access_token(&cookies, new_access_token, &config);
-                            (
-                                StatusCode::OK,
-                                Json(json!({
-                                    "status": "success",
-                                    "message": "Access token refreshed"
-                                }))
-                            )
+                            match authentication_service.generate_refresh_token(&claims.sub) {
+                                Ok(new_refresh_token) => {
+                                    // Set both new tokens in cookies
+                                    set_access_token(&cookies, new_access_token, &config);
+                                    set_refresh_token(&cookies, new_refresh_token, &config);
+
+                                    (
+                                        StatusCode::OK,
+                                        Json(json!({
+                                            "status": "success",
+                                            "message": "Tokens refreshed successfully"
+                                        }))
+                                    )
+                                },
+                                Err(_) => (
+                                    StatusCode::INTERNAL_SERVER_ERROR,
+                                    Json(json!({
+                                        "status": "error",
+                                        "message": "Failed to generate new refresh token"
+                                    }))
+                                )
+                            }
                         },
                         Err(_) => (
                             StatusCode::INTERNAL_SERVER_ERROR,
@@ -107,13 +123,16 @@ pub async fn refresh_token_handler(
                         )
                     }
                 },
-                Err(_) => (
-                    StatusCode::UNAUTHORIZED,
-                    Json(json!({
-                        "status": "error",
-                        "message": "Invalid refresh token"
-                    }))
-                )
+                Err(_) => {
+                    remove_auth_cookies(&cookies);
+                    (
+                        StatusCode::UNAUTHORIZED,
+                        Json(json!({
+                            "status": "error",
+                            "message": "Invalid refresh token"
+                        }))
+                    )
+                }
             }
         },
         None => (
@@ -126,7 +145,6 @@ pub async fn refresh_token_handler(
     }
 }
 
-#[debug_handler]
 pub async fn logout_handler(cookies: Cookies) -> impl IntoResponse {
     remove_auth_cookies(&cookies);
     (
