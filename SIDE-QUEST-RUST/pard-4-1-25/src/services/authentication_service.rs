@@ -40,14 +40,20 @@ pub struct AuthenticationService {
     access_secret: String,
     refresh_secret: String,
     pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<PgConnection>>,
+    config: Config,
 }
 
 impl AuthenticationService {
+    pub fn config(&self) -> &Config {
+        &self.config
+    }
+    
     pub fn new(config: &Config, pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<PgConnection>>) -> Self {
         Self {
             access_secret: config.jwt_access_secret.clone(),
             refresh_secret: config.jwt_refresh_secret.clone(),
             pool,
+            config: config.clone(),
         }
     }
 

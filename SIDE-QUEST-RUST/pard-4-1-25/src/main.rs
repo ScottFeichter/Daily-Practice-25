@@ -36,6 +36,12 @@ pub struct AppState {
     pub db_pool: Pool<ConnectionManager<PgConnection>>,
 }
 
+// Error response struct
+#[derive(serde::Serialize)]
+pub struct ErrorResponse {
+    message: String,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn StdError>> {
     // Load .env file

@@ -24,7 +24,6 @@ use crate::{
 pub async fn login_handler(
     State(authentication_service): State<Arc<AuthenticationService>>,
     cookies: Cookies,
-    config: Extension<Config>,
     Json(credentials): Json<LoginRequest>,
 ) -> impl IntoResponse {
     match authentication_service.validate_credentials(&credentials.username, &credentials.password).await {
@@ -34,8 +33,8 @@ pub async fn login_handler(
                 Ok(access_token) => {
                     match authentication_service.generate_refresh_token(&user_id) {
                         Ok(refresh_token) => {
-                            set_access_token(&cookies, access_token, &config);
-                            set_refresh_token(&cookies, refresh_token, &config);
+                            set_access_token(&cookies, access_token, authentication_service.config());
+                            set_refresh_token(&cookies, refresh_token, authentication_service.config());
 
                             (
                                 StatusCode::OK,
@@ -82,7 +81,6 @@ pub async fn login_handler(
 pub async fn refresh_token_handler(
     State(authentication_service): State<Arc<AuthenticationService>>,
     cookies: Cookies,
-    config: Extension<Config>,
 ) -> impl IntoResponse {
     match get_refresh_token(&cookies) {
         Some(refresh_token) => {
@@ -94,8 +92,8 @@ pub async fn refresh_token_handler(
                             match authentication_service.generate_refresh_token(&claims.sub) {
                                 Ok(new_refresh_token) => {
                                     // Set both new tokens in cookies
-                                    set_access_token(&cookies, new_access_token, &config);
-                                    set_refresh_token(&cookies, new_refresh_token, &config);
+                                    set_access_token(&cookies, new_access_token, authentication_service.config());
+                                    set_refresh_token(&cookies, new_refresh_token, authentication_service.config());
 
                                     (
                                         StatusCode::OK,

@@ -1,0 +1,1 @@
+SelectStatement<FromClause<schema::users::table>, query_builder::select_clause::SelectClause<diesel::expression::select_by::SelectBy<user::User, _>>>

@@ -9,7 +9,8 @@ pub struct Post {
     pub id: i32,
     pub title: String,
     pub content: String,
-    pub created_at: chrono::NaiveDateTime
+    pub created_at: chrono::NaiveDateTime,
+    pub user_id: i32,
 }
 
 #[derive(Insertable, Deserialize)]
@@ -17,6 +18,7 @@ pub struct Post {
 pub struct NewPost {
     pub title: String,
     pub content: String,
+    pub user_id: i32,
 }
 
 #[derive(AsChangeset,Deserialize)]
