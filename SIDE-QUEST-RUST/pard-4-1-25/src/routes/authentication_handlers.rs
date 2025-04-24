@@ -3,7 +3,6 @@ use axum::{
     response::IntoResponse,
     Json,
     http::StatusCode,
-    Extension,
 };
 use tower_cookies::Cookies;
 use std::sync::Arc;
@@ -18,7 +17,6 @@ use crate::{
         get_refresh_token,
         remove_auth_cookies
     },
-    config::Config,
 };
 
 pub async fn login_handler(
