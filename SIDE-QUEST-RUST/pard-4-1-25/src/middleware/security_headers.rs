@@ -12,6 +12,7 @@ pub async fn security_headers(
     let mut response = next.run(request).await;
     let headers = response.headers_mut();
 
+    
     // Content Security Policy
     headers.insert(
         header::CONTENT_SECURITY_POLICY,

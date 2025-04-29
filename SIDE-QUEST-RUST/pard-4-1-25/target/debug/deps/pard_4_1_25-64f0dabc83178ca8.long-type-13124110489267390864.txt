@@ -1,0 +1,1 @@
+axum::middleware::FromFn<fn(Cookies, axum::extract::State<Arc<AuthenticationService>>, axum::http::Request<Body>, Next) -> impl std::future::Future<Output = Response<Body>> {authentication_middleware}, Arc<AppState>, Route, _>

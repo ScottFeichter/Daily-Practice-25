@@ -5,7 +5,6 @@ use axum::{
 };
 use std::sync::Arc;
 use diesel::PgConnection;
-
 use crate::{
     services::authentication_service::AuthenticationService,
     handlers::authentication_handlers::*,

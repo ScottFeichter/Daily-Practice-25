@@ -15,7 +15,7 @@ pub fn create_cors_layer(environment: Environment) -> CorsLayer {
     match environment {
         Environment::Production => {
             CorsLayer::new()
-                .allow_origin("https://your-production-domain.com".parse::<HeaderValue>().unwrap())
+                .allow_origin("https://localhost:5173".parse::<HeaderValue>().unwrap())
                 .allow_methods([
                     Method::GET,
                     Method::POST,
@@ -32,7 +32,7 @@ pub fn create_cors_layer(environment: Environment) -> CorsLayer {
         }
         Environment::Development => {
             CorsLayer::new()
-                .allow_origin("http://127.0.0.1:5678".parse::<HeaderValue>().unwrap())
+                .allow_origin("http://localhost:5173".parse::<HeaderValue>().unwrap())
                 .allow_methods([
                     Method::GET,
                     Method::POST,

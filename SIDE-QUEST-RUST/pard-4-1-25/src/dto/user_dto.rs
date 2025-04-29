@@ -2,18 +2,7 @@ use serde::{Serialize, Deserialize};
 use validator::{Validate, ValidationError};
 use core::str;
 use regex::Regex;
-
-#[derive(Debug, Deserialize, Validate)]
-pub struct LoginRequest {
-    #[validate(
-        length(min = 1, message = "Email is required"),
-        email(message = "Invalid email format")
-    )]
-    pub email: String,
-
-    #[validate(length(min = 1, message = "Password is required"))]
-    pub password: String,
-}
+use lazy_static::lazy_static;
 
 
 #[derive(Validate, Deserialize)]
@@ -24,6 +13,10 @@ pub struct CreateUserRequest {
     #[validate(
         length(min = 1, message = "Username is required"),
         length(max = 25, message = "Username must not be more than 25 characters. "),
+        regex(
+            path = "USERNAME_REGEX",
+            message = "Username can only contain letters, numbers, and underscores"
+        ),
     )]
     pub username: String,
 
@@ -47,9 +40,19 @@ pub struct CreateUserRequest {
         must_match(other = "password", message="passwords do not match")
     )]
     pub verify_password: String,
+
+    #[validate(custom = "validate_terms_acceptance")]
+    pub terms_accepted: bool,
 }
 
-// Custom password validator function
+
+// Helper for username regex
+lazy_static! {
+    static ref USERNAME_REGEX: Regex = Regex::new(r"^[a-zA-Z0-9_]+$").unwrap();
+}
+
+
+// Helper for password validator function
 fn validate_password_complexity(password: &str) -> Result<(), ValidationError> {
     let has_uppercase = password.chars().any(|c| c.is_uppercase());
     let has_number = password.chars().any(|c| c.is_numeric());
@@ -66,6 +69,14 @@ fn validate_password_complexity(password: &str) -> Result<(), ValidationError> {
     Ok(())
 }
 
+// Helper for terms of acceptance validation
+fn validate_terms_acceptance(terms: &bool) -> Result<(), ValidationError> {
+    if *terms {
+        Ok(())
+    } else {
+        Err(ValidationError::new("Terms must be accepted"))
+    }
+}
 
 
 #[derive(Deserialize)]

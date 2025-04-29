@@ -47,6 +47,7 @@ pub struct ErrorResponse {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn StdError>> {
+    
     // Load .env file
     dotenv().ok();
 

@@ -7,10 +7,15 @@ use axum::{
 use tower_cookies::Cookies;
 use std::sync::Arc;
 use serde_json::json;
-
+use validator::Validate;
+use tracing::{info, error};
 use crate::{
+    AppState,
     services::authentication_service::AuthenticationService,
-    dto::user_dto::LoginRequest,
+    dto::authentication_dto::{SignupRequest, SignupResponse, LoginRequest},
+    operations::users_operations::create_user,
+    errors::{HttpError, ErrorMessage},
+    db::DbConnExt,
     middleware::cookies::{
         set_access_token,
         set_refresh_token,
@@ -26,6 +31,61 @@ pub async fn protected_handler() -> impl IntoResponse {
         Json(json!({ "message": "This is a protected route" }))
     )
 }
+
+
+pub async fn signup_handler(
+    State(state): State<Arc<AppState>>,
+    Json(signup_data): Json<SignupRequest>,
+) -> Result<Json<SignupResponse>, HttpError> {
+    info!("Processing signup request for email: {}", signup_data.email);
+
+    // Single validation call that will check all our constraints:
+    // - Name length
+    // - Username format and length
+    // - Email format
+    // - Password complexity and length
+    // - Password match
+    // - Terms acceptance
+    if let Err(_errors) = signup_data.validate() {
+        info!("Inside let Err");
+        return Err(HttpError::validation_error(ErrorMessage::SignUpError.to_string()));
+    }
+
+    let mut conn = state.conn()?;
+
+    match create_user(
+        &mut conn,
+        signup_data.email,
+        signup_data.name,
+        signup_data.username,
+        signup_data.password,
+    ) {
+        Ok(user) => {
+            info!("Successfully created user with ID: {}", user.id);
+            Ok(Json(SignupResponse {
+                message: "User successfully created".to_string(),
+                user_id: user.id.to_string(),
+            }))
+        }
+        Err(e) => {
+            error!("Error creating user: {}", e);
+            if e.to_string().contains("UNIQUE constraint failed") {
+                Err(HttpError::unique_constraint_validation(
+                    ErrorMessage::UserExists.to_string(),
+                ))
+            } else {
+                Err(HttpError::server_error(
+                    ErrorMessage::UserCreationError.to_string(),
+                ))
+            }
+        }
+    }
+}
+
+
+
+
+
 
 pub async fn login_handler(
     State(authentication_service): State<Arc<AuthenticationService>>,

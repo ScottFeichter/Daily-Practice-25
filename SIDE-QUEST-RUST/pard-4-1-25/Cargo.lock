@@ -2165,6 +2165,7 @@ dependencies = [
  "dotenvy",
  "hyper",
  "jsonwebtoken",
+ "lazy_static",
  "pq-sys",
  "rand",
  "regex",

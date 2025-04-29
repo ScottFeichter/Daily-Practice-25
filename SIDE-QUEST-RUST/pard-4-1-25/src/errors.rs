@@ -1,45 +1,6 @@
-// use axum::{http::StatusCode, response::{IntoResponse, Response}, Json};
-// use serde_json::json;
-// use std::collections::HashMap;
-// use thiserror::Error;
-
-// #[derive(Debug, Error)]
-// pub enum AppError {
-//     #[error("The requested resource couldn't be found.")]
-//     NotFound,
-
-//     #[error("Validation error")]
-//     ValidationError(HashMap<String, String>),
-
-//     #[error("Internal Server Error")]
-//     InternalServerError,
-// }
-
-// impl IntoResponse for AppError {
-//     fn into_response(self) -> Response {
-//         let status_code: StatusCode = match self {
-//             AppError::NotFound => StatusCode::NOT_FOUND,
-//             AppError::ValidationError(_) => StatusCode::BAD_REQUEST,
-//             AppError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
-//         };
-
-//         let mut response_body: serde_json::Value = json!({
-//             "success": false,
-//             "message": self.to_string(),
-//         });
-
-//         if let AppError::ValidationError(errors) = self {
-//             response_body["errors"] = serde_json::to_value(errors).unwrap();
-//         }
-
-//         (status_code, Json(response_body)).into_response()
-//     }
-// }
-
-
 use axum::{ http::StatusCode, response::{ IntoResponse, Response }, Json };
 use serde_json::json;
-use std::{ collections::HashMap, fmt };
+use std::{ collections::HashMap, f64::consts::E, fmt };
 use thiserror::Error;
 use serde::{ Serialize, Deserialize };
 
@@ -113,6 +74,7 @@ pub enum ErrorMessage {
     UserUpdateError,
     PostNotFound,
     DeletePostError,
+    SignUpError,
 }
 
 impl ToString for ErrorMessage {
@@ -142,6 +104,7 @@ impl ErrorMessage {
             ErrorMessage::PostNotFound => "Post belonging to this id does not exist".to_string(),
             ErrorMessage::PostUpdateError => "Unable to update post".to_string(),
             ErrorMessage::PostsByUserError => "Error fetching posts for this user".to_string(),
+            ErrorMessage::SignUpError => "Validation error during signup".to_string(),
             ErrorMessage::TokenNotProvided =>
                 "You are not logged in, please provide a token".to_string(),
             ErrorMessage::UserCreationError => "Unable to create user.".to_string(),
@@ -207,6 +170,13 @@ impl HttpError {
         HttpError {
             message: message.into(),
             status: StatusCode::NOT_FOUND,
+        }
+    }
+
+    pub fn validation_error(message: impl Into<String>) -> Self {
+        HttpError {
+            message: message.into(),
+            status: StatusCode::BAD_REQUEST,
         }
     }
 

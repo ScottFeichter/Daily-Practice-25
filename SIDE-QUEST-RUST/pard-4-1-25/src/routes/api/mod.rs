@@ -1,2 +1,2 @@
 pub mod users_router;
-pub mod posts;
+pub mod posts_router;
