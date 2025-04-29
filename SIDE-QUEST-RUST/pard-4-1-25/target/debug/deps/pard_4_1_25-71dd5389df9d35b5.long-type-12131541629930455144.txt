@@ -1,0 +1,1 @@
+fn(axum::extract::State<Arc<AppState>>, axum::Json<user_dto::CreateUserRequest>) -> impl std::future::Future<Output = Result<axum::Json<user::User>, HttpError>> {create_user_handler}

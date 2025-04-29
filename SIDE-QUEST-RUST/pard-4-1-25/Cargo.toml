@@ -56,6 +56,9 @@ hyper = { version = "1.0", features = ["full"] }
 
 uuid = { version = "1.6", features = ["v4", "serde"] }
 
+validator = { version = "0.16.1", features = ["derive"] }
+regex = "1.11.1"
+
 
 [dev-dependencies]
 cargo-watch = "8.5.3"                                                       # Equivalent to nodemon

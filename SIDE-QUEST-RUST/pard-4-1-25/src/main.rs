@@ -3,6 +3,9 @@ mod middleware;
 mod services;
 mod routes;
 mod errors;
+mod operations;
+mod handlers;
+mod dto;
 pub mod models;
 pub mod schema;
 pub mod db;
@@ -26,8 +29,8 @@ use middleware::{
     security_headers::security_headers
 };
 use routes::{
-    api::users::user_routes,
-    general::general_routes,
+    api::users_router::user_routes,
+    general_router::general_routes,
     authentication_router::authentication_routes,
 };
 

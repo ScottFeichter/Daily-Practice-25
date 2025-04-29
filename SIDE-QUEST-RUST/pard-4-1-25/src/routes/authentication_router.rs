@@ -1,17 +1,14 @@
 use axum::{
     Router,
     routing::{post, get},
-    response::IntoResponse,
-    Json,
     middleware,
 };
 use std::sync::Arc;
-use serde_json::json;
 use diesel::PgConnection;
 
 use crate::{
     services::authentication_service::AuthenticationService,
-    routes::authentication_handlers::{login_handler, refresh_token_handler, logout_handler},
+    handlers::authentication_handlers::*,
     middleware::{
         authentication_middleware::authentication_middleware,
         cookies::cookie_layer,
@@ -42,12 +39,4 @@ pub fn authentication_routes(
         .merge(protected_routes)
         .with_state(authentication_service)
         .layer(cookie_layer())
-}
-
-// Keep the protected handler function
-async fn protected_handler() -> impl IntoResponse {
-    (
-        axum::http::StatusCode::OK,
-        Json(json!({ "message": "This is a protected route" }))
-    )
 }
