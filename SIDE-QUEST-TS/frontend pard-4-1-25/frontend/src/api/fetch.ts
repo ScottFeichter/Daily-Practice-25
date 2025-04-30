@@ -7,8 +7,13 @@ interface RequestConfig {
   body?: any;
 }
 
+interface ApiResponse<T> {
+  data: T;
+  headers: Headers;
+}
+
 // Constants
-const BASE_URL = 'http://localhost:5678';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5678';
 
 // Store the current CSRF token
 let csrfToken: string | null = null;
@@ -50,7 +55,7 @@ const fetchCsrfToken = async (): Promise<void> => {
 const client = async <T>(
   endpoint: string,
   { method = 'GET', headers = {}, body }: RequestConfig = {}
-): Promise<T> => {
+): Promise<ApiResponse<T>> => {
   // Fetch CSRF token if we don't have one and it's not a CSRF token request
   if (!getCsrfToken() && !endpoint.includes('csrf-token')) {
     await fetchCsrfToken();
@@ -88,7 +93,11 @@ const client = async <T>(
   }
 
   try {
-    return await response.json();
+    const data = await response.json();
+    return {
+      data,
+      headers: response.headers
+    };
   } catch (e) {
     return Promise.reject({
       message: 'Failed to parse success response',
@@ -97,4 +106,35 @@ const client = async <T>(
   }
 };
 
-export { client, fetchCsrfToken, getCsrfToken };
+// Helper function to handle common response patterns
+const handleResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {
+  updateCsrfTokenFromResponse(response);
+
+  if (!response.ok) {
+    try {
+      const error = await response.json();
+      return Promise.reject(error);
+    } catch {
+      return Promise.reject({
+        status: response.status,
+        statusText: response.statusText,
+        message: 'Failed to parse error response'
+      });
+    }
+  }
+
+  try {
+    const data = await response.json();
+    return {
+      data,
+      headers: response.headers
+    };
+  } catch (e) {
+    return Promise.reject({
+      message: 'Failed to parse success response',
+      error: e
+    });
+  }
+};
+
+export { client, fetchCsrfToken, getCsrfToken, handleResponse, type ApiResponse };

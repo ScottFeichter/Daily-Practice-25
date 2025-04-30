@@ -1,4 +1,4 @@
-import { client } from './fetch';
+import { client, ApiResponse } from './fetch';
 
 // Types
 export interface SignUpRequest {
@@ -11,8 +11,12 @@ export interface SignUpRequest {
 }
 
 export interface SignUpResponse {
-    message: string;
-    user_id: string;
+    message?: string;
+    user?: {
+        id: number;
+        email: string;
+        // ... other user properties
+    };
 }
 
 export interface LoginRequest {
@@ -22,6 +26,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
     message: string;
+    status: string;
     user: {
         id: string;
         username: string;
@@ -36,14 +41,13 @@ export interface AuthError {
 }
 
 // Auth API functions
-export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
+export const signUp = async (data: SignUpRequest): Promise<ApiResponse<SignUpResponse>> => {
     try {
         return await client<SignUpResponse>('/api/signup', {
             method: 'POST',
             body: data,
         });
     } catch (error) {
-        // Type guard to handle specific API errors
         if (error instanceof Error) {
             throw new Error(`Signup failed: ${error.message}`);
         }
@@ -51,9 +55,9 @@ export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
     }
 };
 
-export const login = async (data: LoginRequest): Promise<LoginResponse> => {
+export const login = async (data: LoginRequest): Promise<ApiResponse<LoginResponse>> => {
     try {
-        return await client<LoginResponse>('/login', {
+        return await client<LoginResponse>('/api/auth/login', {
             method: 'POST',
             body: data,
         });
@@ -65,9 +69,9 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
     }
 };
 
-export const logout = async (): Promise<void> => {
+export const logout = async (): Promise<ApiResponse<void>> => {
     try {
-        await client('/logout', {
+        return await client<void>('/logout', {
             method: 'POST',
         });
     } catch (error) {
@@ -78,7 +82,7 @@ export const logout = async (): Promise<void> => {
     }
 };
 
-export const getCurrentUser = async () => {
+export const getCurrentUser = async (): Promise<ApiResponse<LoginResponse>> => {
     try {
         return await client<LoginResponse>('/me', {
             method: 'GET',
@@ -91,10 +95,14 @@ export const getCurrentUser = async () => {
     }
 };
 
+interface MessageResponse {
+    message: string;
+}
+
 // Password reset functions
-export const requestPasswordReset = async (email: string): Promise<{ message: string }> => {
+export const requestPasswordReset = async (email: string): Promise<ApiResponse<MessageResponse>> => {
     try {
-        return await client<{ message: string }>('/password-reset-request', {
+        return await client<MessageResponse>('/password-reset-request', {
             method: 'POST',
             body: { email },
         });
@@ -106,9 +114,9 @@ export const requestPasswordReset = async (email: string): Promise<{ message: st
     }
 };
 
-export const resetPassword = async (token: string, newPassword: string): Promise<{ message: string }> => {
+export const resetPassword = async (token: string, newPassword: string): Promise<ApiResponse<MessageResponse>> => {
     try {
-        return await client<{ message: string }>('/password-reset', {
+        return await client<MessageResponse>('/password-reset', {
             method: 'POST',
             body: {
                 token,
@@ -124,9 +132,9 @@ export const resetPassword = async (token: string, newPassword: string): Promise
 };
 
 // Email verification
-export const verifyEmail = async (token: string): Promise<{ message: string }> => {
+export const verifyEmail = async (token: string): Promise<ApiResponse<MessageResponse>> => {
     try {
-        return await client<{ message: string }>(`/verify-email/${token}`, {
+        return await client<MessageResponse>(`/verify-email/${token}`, {
             method: 'POST',
         });
     } catch (error) {
@@ -138,9 +146,9 @@ export const verifyEmail = async (token: string): Promise<{ message: string }> =
 };
 
 // Resend verification email
-export const resendVerificationEmail = async (): Promise<{ message: string }> => {
+export const resendVerificationEmail = async (): Promise<ApiResponse<MessageResponse>> => {
     try {
-        return await client<{ message: string }>('/resend-verification', {
+        return await client<MessageResponse>('/resend-verification', {
             method: 'POST',
         });
     } catch (error) {
@@ -160,7 +168,7 @@ export interface UpdateProfileRequest {
     new_password?: string;
 }
 
-export const updateProfile = async (data: UpdateProfileRequest): Promise<LoginResponse> => {
+export const updateProfile = async (data: UpdateProfileRequest): Promise<ApiResponse<LoginResponse>> => {
     try {
         return await client<LoginResponse>('/profile', {
             method: 'PUT',
